@@ -40,6 +40,8 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           <Link href="/#problem" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">The Problem</Link>
           <Link href="/#how-it-works" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">How it Works</Link>
+          <Link href="/verify" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">Verify Farm</Link>
+          <Link href="/marketplace" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">Marketplace</Link>
           
           {user ? (
             <div className="flex items-center gap-4">
