@@ -35,8 +35,8 @@ export default function SignUp() {
       if (error) throw error;
 
       if (data?.session) {
-        router.push("/dashboard");
         router.refresh();
+        router.push("/dashboard");
       } else {
         setSuccess(true);
       }
