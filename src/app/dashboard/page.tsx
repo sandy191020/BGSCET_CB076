@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { MapContainer } from "@/components/map/MapContainer";
 import { AnalysisPanel } from "@/components/dashboard/AnalysisPanel";
