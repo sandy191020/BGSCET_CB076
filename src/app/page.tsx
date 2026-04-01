@@ -59,7 +59,7 @@ export default function Home() {
             className="mt-10 flex items-center justify-center gap-x-6"
           >
             <Link
-              href="/dashboard"
+              href="/auth/signup"
               className="group flex items-center gap-2 rounded-full bg-emerald-600 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-500 hover:scale-105"
             >
               Start Earning
