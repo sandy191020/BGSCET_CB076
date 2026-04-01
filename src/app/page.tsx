@@ -1,18 +1,35 @@
 "use client";
 
-import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play, AlertCircle } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play, ChevronDown, Box, ShoppingBag, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import { AuctionBanner } from "@/components/AuctionBanner";
+import React, { useState, useEffect, useRef } from "react";
 import { CinematicDemo } from "@/components/CinematicDemo";
+import { AuctionBanner } from "@/components/AuctionBanner";
+import { TypewriterTitle } from "@/components/TypewriterTitle";
 import { supabase } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function LandingPage() {
   const [user, setUser] = useState<User | null>(null);
-  const { scrollYProgress } = useScroll();
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+  });
+  
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.7], [0, 1]);
+  const contentY = useTransform(scrollYProgress, [0, 0.5], [0, -60]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2 }
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -30,28 +47,133 @@ export default function LandingPage() {
     <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30 overflow-x-hidden">
       {/* Dynamic Auction Announcement Banner */}
       <AuctionBanner />
-
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-8">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="h-10 w-10 bg-emerald-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-500 shadow-lg shadow-emerald-500/20">
-              <Leaf className="text-black h-6 w-6" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter uppercase italic">GreenLedger</span>
-          </div>
+      <CinematicDemo isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
+      {/* Hero Section with Video Background */}
+      <section ref={heroRef} className="relative overflow-hidden min-h-screen flex items-center justify-center px-6 lg:px-8">
+        {/* Video Background (Static, decoupled from motion for raw performance) */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <video
+            src="/assets/hero-bg.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute top-0 left-0 h-full w-full object-cover transform-gpu"
+          />
+          {/* Default Dark Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
+          {/* Emerald tint overlay */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-emerald-950/30 via-transparent to-transparent" />
           
-          <div className="flex items-center gap-6">
-            {!user ? (
-              <>
-                <Link href="/auth/signin" className="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">Sign In</Link>
-                <Link href="/auth/signup" className="bg-white text-black px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 shadow-xl shadow-white/5">Get Started</Link>
-              </>
-            ) : (
-              <Link href="/dashboard" className="bg-white text-black px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 shadow-xl shadow-white/5">Go to Dashboard</Link>
-            )}
-          </div>
-        </nav>
-      </header>
+          {/* Parallax Fade Overlay - Fades in black to hide video on scroll */}
+          <motion.div 
+            style={{ opacity: overlayOpacity }}
+            className="absolute inset-0 bg-[#000000] z-10 will-change-opacity"
+          />
+        </div>
+
+        <motion.div style={{ y: contentY }} className="relative z-10 mx-auto max-w-4xl text-center">
+
+          <TypewriterTitle />
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-8 text-lg leading-8 text-zinc-400"
+          >
+            GreenLedger connects sustainable farmers directly to the $2B global carbon credit market. 
+            Automated satellite verification. AI-driven scoring. Blockchain-powered liquidity.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mt-10 flex items-center justify-center gap-x-6"
+          >
+            <Link
+              href="/verify"
+              className="group flex items-center gap-2 rounded-full bg-emerald-600 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-500 hover:scale-105"
+            >
+              Start Earning
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <button 
+              onClick={() => setIsDemoOpen(true)}
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20"
+            >
+              <Play className="h-5 w-5 fill-emerald-500 text-emerald-500" />
+              Watch Demo
+            </button>
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll Down Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+        >
+          <span className="text-xs font-mono uppercase tracking-[0.3em] text-zinc-400">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="h-6 w-6 text-emerald-400" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="how-it-works" className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+        {/* Background ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 blur-3xl rounded-full pointer-events-none opacity-50 transform-gpu" />
+        
+        <div className="relative z-10 text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Engineered for Transparency</h2>
+          <p className="mt-4 text-zinc-400 max-w-2xl mx-auto text-lg">Our multi-layered verification system ensures every carbon credit is backed by scientific reality.</p>
+        </div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <FeatureCard 
+            icon={<Satellite className="h-7 w-7 text-emerald-400" />}
+            title="Satellite Verification"
+            description="Sentinel-2 satellite imagery verifies farmland conditions and vegetation health using NDVI analysis."
+            accentColor="emerald"
+            slideFrom="left"
+          />
+          <FeatureCard 
+            icon={<BrainCircuit className="h-7 w-7 text-emerald-400" />}
+            title="AI Sustainability Scoring"
+            description="Mastra AI analyzes vegetation data and automatically scores farm sustainability."
+            accentColor="emerald"
+            slideFrom="right"
+          />
+          <FeatureCard 
+            icon={<Box className="h-7 w-7 text-emerald-400" />}
+            title="Blockchain Tokenization"
+            description="Verified carbon reduction is converted into ERC-1155 carbon credit tokens minted on Polygon."
+            accentColor="emerald"
+            slideFrom="left"
+          />
+          <FeatureCard 
+            icon={<ShoppingBag className="h-7 w-7 text-emerald-400" />}
+            title="Direct Carbon Marketplace"
+            description="Companies purchase carbon credits directly from farmers without intermediaries."
+            accentColor="emerald"
+            slideFrom="right"
+          />
+        </motion.div>
+      </section>
 
       <main>
         {/* Cinematic Hero */}
@@ -193,5 +315,48 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+  );
+}
+function FeatureCard({ icon, title, description, accentColor, slideFrom = "left" }: { icon: React.ReactNode, title: string, description: string, accentColor: string, slideFrom?: "left" | "right" }) {
+  const xOffset = slideFrom === "left" ? -80 : 80;
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, x: xOffset },
+        visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+      }}
+      whileHover={{ y: -10, scale: 1.03 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="group relative overflow-hidden rounded-[20px] bg-slate-900/40 p-8 backdrop-blur-xl border border-white/5 transition-all hover:border-emerald-500/30 shadow-2xl"
+    >
+      {/* Glossy gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Robot animation embedding onto the feature card */}
+      <div className="absolute -top-4 -right-4 w-32 h-32 opacity-80 pointer-events-none group-hover:opacity-100 transition-opacity z-20">
+         <iframe src='https://my.spline.design/rememberallrobot-zwWQBEBI2pJwOFDFZSqBhrZx/' frameBorder='0' width='100%' height='100%' style={{ pointerEvents: 'none' }}></iframe>
+      </div>
+      
+      {/* Icon frame with micro-animation */}
+      <div className="relative mb-6 inline-flex p-3 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+        <motion.div
+          animate={{ rotate: [0, 5, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+        >
+          {icon}
+        </motion.div>
+      </div>
+
+      <h3 className="relative z-10 text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+        {title}
+      </h3>
+      
+      <p className="relative z-10 text-zinc-400 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
+        {description}
+      </p>
+
+      {/* Decorative accent glow */}
+      <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-emerald-500/5 blur-2xl rounded-full group-hover:bg-emerald-500/10 transition-colors" />
+    </motion.div>
   );
 }
