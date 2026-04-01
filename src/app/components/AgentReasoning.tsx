@@ -44,6 +44,9 @@ export function AgentReasoning({ lines, isLoading, result }: AgentReasoningProps
     return "from-red-500 to-red-400";
   };
 
+  const calcLine = lines.find(l => l.includes("Farm size:"));
+  const vegetationLine = lines.find(l => l.includes("Vegetation density index"));
+
   return (
     <div className="flex flex-col h-full rounded-2xl border border-emerald-500/20 bg-zinc-950 overflow-hidden">
       {/* Terminal Header */}
@@ -126,22 +129,43 @@ export function AgentReasoning({ lines, isLoading, result }: AgentReasoningProps
             animate={{ opacity: 1, y: 0 }}
             className="border-t border-white/10 p-4 space-y-4 bg-zinc-900/50"
           >
-            {/* NDVI Score Bar */}
-            <div>
-              <div className="flex justify-between text-xs font-mono mb-1.5">
-                <span className="text-zinc-500 uppercase tracking-wider">NDVI Score</span>
-                <span className={ndvi >= 0.75 ? "text-emerald-400" : ndvi >= 0.55 ? "text-yellow-400" : "text-red-400"}>
-                  {ndvi.toFixed(2)}
-                </span>
+            {/* NDVI Score Bar + Detailed Reasoning */}
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-xs font-mono mb-1.5">
+                  <span className="text-zinc-500 uppercase tracking-wider">NDVI Score</span>
+                  <span className={ndvi >= 0.75 ? "text-emerald-400" : ndvi >= 0.55 ? "text-yellow-400" : "text-red-400"}>
+                    {ndvi.toFixed(2)}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-zinc-800 overflow-hidden">
+                  <motion.div
+                    className={`h-full rounded-full bg-gradient-to-r ${getNdviBarColor(ndvi)}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${ndviPercent}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  />
+                </div>
               </div>
-              <div className="h-2 rounded-full bg-zinc-800 overflow-hidden">
-                <motion.div
-                  className={`h-full rounded-full bg-gradient-to-r ${getNdviBarColor(ndvi)}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${ndviPercent}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </div>
+
+              {/* Detailed Reasoning Block */}
+              {result.approved && (vegetationLine || calcLine) && (
+                <div className="bg-black/40 border border-white/5 rounded-lg p-3 space-y-2 mt-2">
+                  <div className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">AI Reasoning Breakdown</div>
+                  {vegetationLine && (
+                    <div className="text-[11px] text-zinc-300 font-mono leading-relaxed flex items-start gap-2">
+                      <span className="text-emerald-500/50 mt-0.5">└</span>
+                      <span>{vegetationLine.replace("✅", "").trim()}</span>
+                    </div>
+                  )}
+                  {calcLine && (
+                    <div className="text-[11px] text-zinc-300 font-mono leading-relaxed flex items-start gap-2">
+                      <span className="text-emerald-500/50 mt-0.5">└</span>
+                      <span>{calcLine.replace("✅", "").trim()}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Fraud Risk + Credits */}
