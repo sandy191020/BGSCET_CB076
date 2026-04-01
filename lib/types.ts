@@ -65,4 +65,8 @@ export interface MintTokenRequest {
   creditAmount: number;
   satelliteHash: string;
   agentVerdict: AgentResult;
+  farmCoordinates: {
+    lat: number;
+    lng: number;
+  };
 }

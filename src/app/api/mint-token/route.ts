@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { MintTokenRequest } from '../../../../lib/types';
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-const EXPLORER_URL = 'https://mumbai.polygonscan.com';
+const EXPLORER_URL = 'https://amoy.polygonscan.com';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,12 +23,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Step 1: Pre-minting Fraud Check
+    const { checkDuplicateSubmission, checkSubmissionFrequency, recordSubmission } = await import(
+      '../../../../agent/fraudDetection'
+    );
+    const farmCoordinates = (body as any).farmCoordinates; // types are getting updated
+    const duplicateCheck = checkDuplicateSubmission(farmerId, farmCoordinates);
+    const frequencyCheck = checkSubmissionFrequency(farmerId);
+
+    if (!duplicateCheck.passed || !frequencyCheck.passed) {
+      return NextResponse.json(
+        {
+          error: 'Fraudulent activity detected',
+          details: !duplicateCheck.passed ? duplicateCheck.reason : frequencyCheck.reason,
+        },
+        { status: 403 }
+      );
+    }
+
     // Demo mode: return a realistic mock transaction
     if (DEMO_MODE || !process.env.PRIVATE_KEY) {
       await new Promise((r) => setTimeout(r, 1500)); // simulate block confirmation
       const mockTxHash = `0x${Array.from({ length: 64 }, () =>
         Math.floor(Math.random() * 16).toString(16)
       ).join('')}`;
+
+      // RECORD the submission in memory only if it actually "minted"
+      recordSubmission(farmerId, farmCoordinates);
 
       return NextResponse.json({
         txHash: mockTxHash,
@@ -57,6 +78,9 @@ export async function POST(req: NextRequest) {
       satelliteHash,
       creditScore
     );
+
+    // RECORD the submission after the real blockchain transaction
+    recordSubmission(farmerId, farmCoordinates);
 
     return NextResponse.json({
       txHash: result.txHash,

@@ -1,4 +1,4 @@
-import { calculateNDVI, calculateCredits, getNDVILabel, getRecommendedAction } from './scoring';
+import { fetchTrueNDVI, calculateCredits, getNDVILabel, getRecommendedAction } from './scoring';
 import {
   checkDuplicateSubmission,
   checkSubmissionFrequency,
@@ -31,12 +31,12 @@ export async function* runVerification(
   // Step 1: NDVI Analysis
   yield {
     step: 'NDVI Analysis',
-    message: '🛰️  Analyzing satellite imagery...',
+    message: '🛰️  Analyzing Sentinel-2 L2A satellite data (30-day aggregation)...',
   };
 
   await sleep(500);
 
-  const ndviScore = calculateNDVI(input.farmCoordinates);
+  const ndviScore = await fetchTrueNDVI(input.farmCoordinates);
   const ndviLabel = getNDVILabel(ndviScore);
 
   const ndviMessage = `Vegetation density index ${ndviScore.toFixed(2)} detected — ${ndviLabel.toLowerCase()}`;
@@ -145,10 +145,9 @@ export async function* runVerification(
     data: { approved, creditAmount, fraudRisk: riskAssessment.risk },
   };
 
-  // Record this submission
-  if (approved) {
-    recordSubmission(input.farmerId, input.farmCoordinates);
-  }
+  // Note: recordSubmission has been moved to the actual minting route to 
+  // allow farmers to verify their metadata multiple times before committing.
+
 
   return {
     approved,

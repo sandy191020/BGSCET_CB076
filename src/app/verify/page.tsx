@@ -32,6 +32,57 @@ export default function VerifyPage() {
   const [mintError, setMintError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
+  // Custom Farm State
+  const [isCustomLoc, setIsCustomLoc] = useState(false);
+  const [customLat, setCustomLat] = useState("12.9716");
+  const [customLng, setCustomLng] = useState("77.5946");
+  const [customSize, setCustomSize] = useState("10");
+
+  // Geocoding Search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleSearchLocation = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        setCustomLat(lat.toFixed(6));
+        setCustomLng(lng.toFixed(6));
+        
+        // Auto-plot to map
+        const size = parseFloat(customSize) || 10;
+        const offset = 0.001 * Math.sqrt(size);
+        setSelectedFarm({
+          id: Date.now(),
+          name: data[0].display_name.split(',')[0] || "Search Result",
+          sizeAcres: size,
+          ownerId: "custom_farmer_001",
+          verified: false,
+          coordinates: {
+            lat,
+            lng,
+            polygon: [
+              [lng - offset, lat + offset],
+              [lng + offset, lat + offset],
+              [lng + offset, lat - offset],
+              [lng - offset, lat - offset],
+              [lng - offset, lat + offset]
+            ] as [number, number][]
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Search failed:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const stepIndex = {
     idle: 0,
     verifying: 1,
@@ -138,6 +189,10 @@ export default function VerifyPage() {
           creditAmount: agentResult.creditAmount,
           satelliteHash: agentResult.imageHash,
           agentVerdict: agentResult,
+          farmCoordinates: {
+            lat: selectedFarm.coordinates.lat,
+            lng: selectedFarm.coordinates.lng,
+          },
         }),
       });
 
@@ -214,12 +269,13 @@ export default function VerifyPage() {
           <div className="lg:col-span-3 flex flex-col gap-4">
 
             {/* Farm selector tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {DEMO_FARMS.map((farm) => (
                 <button
                   key={farm.id}
                   onClick={() => {
                     setSelectedFarm(farm as Farm);
+                    setIsCustomLoc(false);
                     if (step === "minted") handleReset();
                   }}
                   className={`flex-shrink-0 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
@@ -232,11 +288,138 @@ export default function VerifyPage() {
                   <span className="truncate max-w-[140px]">{farm.name}</span>
                 </button>
               ))}
+              
+              <button
+                onClick={() => {
+                  setSelectedFarm(null);
+                  setIsCustomLoc(true);
+                  if (step === "minted") handleReset();
+                }}
+                className={`flex-shrink-0 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                  isCustomLoc
+                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
+                    : "border-white/10 bg-zinc-900 text-zinc-400 hover:border-white/20 hover:text-white"
+                }`}
+              >
+                <span className="truncate max-w-[140px]">+ Custom Location</span>
+              </button>
             </div>
+
+            {/* Custom Location Form */}
+            {isCustomLoc && (
+              <div className="flex flex-col gap-3 bg-zinc-900 p-4 rounded-xl border border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-emerald-400">Custom Coordinates</span>
+                  <button
+                    onClick={() => {
+                      if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                          (pos) => {
+                            setCustomLat(pos.coords.latitude.toFixed(6));
+                            setCustomLng(pos.coords.longitude.toFixed(6));
+                          },
+                          (err) => console.warn(err)
+                        );
+                      }
+                    }}
+                    className="flex items-center gap-1.5 text-[11px] font-medium text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 px-2.5 py-1 rounded-md transition-colors"
+                  >
+                    📍 Get Current Location
+                  </button>
+                </div>
+                
+                {/* Search Bar */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Search location (e.g., Bangalore)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSearchLocation();
+                    }}
+                    className="flex-1 bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  />
+                  <button
+                    onClick={handleSearchLocation}
+                    disabled={isSearching || !searchQuery.trim()}
+                    className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 hover:text-white border border-white/10 transition-colors px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    {isSearching ? "..." : "Search"}
+                  </button>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 space-y-1">
+                    <label className="text-xs text-zinc-500">Latitude</label>
+                    <input
+                      type="number"
+                      value={customLat}
+                      onChange={(e) => setCustomLat(e.target.value)}
+                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <label className="text-xs text-zinc-500">Longitude</label>
+                    <input
+                      type="number"
+                      value={customLng}
+                      onChange={(e) => setCustomLng(e.target.value)}
+                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <label className="text-xs text-zinc-500">Size (Acres)</label>
+                    <input
+                      type="number"
+                      value={customSize}
+                      onChange={(e) => setCustomSize(e.target.value)}
+                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        const lat = parseFloat(customLat) || 0;
+                        const lng = parseFloat(customLng) || 0;
+                        // Generate a small square polygon mock around the center
+                        const offset = 0.001 * Math.sqrt(parseFloat(customSize) || 1);
+                        setSelectedFarm({
+                          id: Date.now(),
+                          name: "Custom Farm",
+                          sizeAcres: parseFloat(customSize) || 1,
+                          ownerId: "custom_farmer_001",
+                          verified: false,
+                          coordinates: {
+                            lat,
+                            lng,
+                            polygon: [
+                              [lng - offset, lat + offset],
+                              [lng + offset, lat + offset],
+                              [lng + offset, lat - offset],
+                              [lng - offset, lat - offset],
+                              [lng - offset, lat + offset]
+                            ] as [number, number][]
+                          }
+                        });
+                      }}
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white border border-white/10 transition-colors px-4 py-2 h-[38px] rounded-lg text-sm font-medium w-full sm:w-auto"
+                    >
+                      Set on Map
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Map */}
             <div className="flex-1">
-              <FarmMap selectedFarm={selectedFarm} className="h-full min-h-[340px]" />
+              <FarmMap 
+                selectedFarm={selectedFarm} 
+                className="h-full min-h-[340px]" 
+                verificationStep={step}
+                ndviScore={agentResult?.ndviScore ?? selectedFarm?.ndviScore}
+              />
             </div>
 
             {/* Verify button */}
@@ -316,7 +499,7 @@ export default function VerifyPage() {
 
                   <div className="flex flex-col gap-2">
                     <a
-                      href={`https://mumbai.polygonscan.com/tx/${txHash}`}
+                      href={`https://amoy.polygonscan.com/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 rounded-xl bg-zinc-800 border border-white/10 px-4 py-2.5 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
