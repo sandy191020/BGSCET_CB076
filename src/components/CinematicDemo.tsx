@@ -99,50 +99,50 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                     className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-transparent pointer-events-none"
                   />
 
-                  {/* Growth Animation Area */}
-                  <div className="relative flex h-full w-full flex-col items-center justify-center pt-20">
+                    {/* Growth Animation Area */}
+                  <div className="relative h-full w-full overflow-hidden pt-10">
                     
                     {/* Floating Particles */}
-                    {[...Array(6)].map((_, i) => (
+                    {[...Array(10)].map((_, i) => (
                       <motion.div
                         key={i}
                         animate={{ 
-                          y: [-20, -100],
-                          opacity: [0, 0.5, 0],
-                          scale: [0.5, 1, 0.5]
+                          y: [-20, -400],
+                          opacity: [0, 0.4, 0],
+                          scale: [0.5, 1.2, 0.5]
                         }}
                         transition={{ 
-                          duration: 4 + Math.random() * 2,
+                          duration: 5 + Math.random() * 3,
                           repeat: Infinity,
-                          delay: i * 0.5
+                          delay: i * 0.4
                         }}
                         className="absolute h-1 w-1 rounded-full bg-emerald-400"
                         style={{ 
-                          left: `${20 + Math.random() * 60}%`,
-                          bottom: '30%'
+                          left: `${Math.random() * 100}%`,
+                          bottom: '10%'
                         }}
                       />
                     ))}
 
-                    {/* Soil Layer */}
+                    {/* Soil Layer (Moved to absolute bottom) */}
                     <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                      initial={{ opacity: 0, y: 50 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
-                      className="absolute bottom-20 h-12 w-48 rounded-[100%] bg-zinc-800/80 blur-xl blur-md"
+                      className="absolute -bottom-10 left-1/2 -translate-x-1/2 h-32 w-[120%] rounded-[100%] bg-gradient-to-t from-zinc-900 to-zinc-800/20 blur-2xl"
                     />
 
-                    {/* The Plant Growth Animation */}
-                    <div className="relative z-10 mb-12 flex flex-col items-center justify-center">
+                    {/* The Plant Growth Animation (Full Screen) */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-10">
                       <AnimatePresence>
-                        {/* Phase 1: The Seed */}
+                        {/* Phase 1: The Seed (Drops from top) */}
                         {step === 1 && (
                           <motion.div
-                            initial={{ y: -50, opacity: 0, scale: 0.5 }}
-                            animate={{ y: 0, opacity: 1, scale: 1 }}
+                            initial={{ y: -300, opacity: 0, scale: 0.5, rotate: 45 }}
+                            animate={{ y: 0, opacity: 1, scale: 1, rotate: 0 }}
                             exit={{ opacity: 0, scale: 1.5 }}
-                            transition={{ duration: 0.8, type: "spring" }}
-                            className="h-4 w-3 rounded-full bg-orange-900 shadow-xl shadow-orange-900/50"
+                            transition={{ duration: 1.2, ease: "easeIn" }}
+                            className="h-6 w-4 rounded-full bg-orange-900 shadow-2xl shadow-orange-900/50"
                           />
                         )}
 
@@ -151,43 +151,43 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="relative"
+                            className="relative h-full w-full"
                           >
-                            <svg width="120" height="200" viewBox="0 0 120 200" className="drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                              {/* Spiraling Main Stem */}
+                            <svg width="100%" height="100%" viewBox="0 0 350 700" preserveAspectRatio="xMidYMax meet" className="drop-shadow-[0_0_40px_rgba(16,185,129,0.2)]">
+                              {/* Spiraling Main Stem (Taller) */}
                               <motion.path
                                 initial={{ pathLength: 0 }}
                                 animate={{ pathLength: 1 }}
-                                transition={{ duration: 3, ease: "easeInOut" }}
-                                d="M60 200 C60 200 40 170 60 140 C80 110 40 80 60 40"
+                                transition={{ duration: 4, ease: "easeInOut" }}
+                                d="M175 700 C175 700 120 600 175 500 C230 400 120 300 175 100"
                                 stroke="#10b981"
-                                strokeWidth="5"
+                                strokeWidth="8"
                                 strokeLinecap="round"
                                 fill="none"
                               />
 
-                              {/* Leaf Groups - Unfurling */}
-                              <LeafGroup delay={1.2} x={60} y={150} scale={0.8} rotation={-45} />
-                              <LeafGroup delay={1.8} x={60} y={110} scale={1} rotation={45} />
-                              <LeafGroup delay={2.4} x={60} y={70} scale={1.2} rotation={-30} />
+                              {/* Larger Leaf Groups */}
+                              <LeafGroup delay={1.2} x={175} y={550} scale={1.2} rotation={-45} />
+                              <LeafGroup delay={2.0} x={175} y={400} scale={1.5} rotation={45} />
+                              <LeafGroup delay={2.8} x={175} y={150} scale={1.8} rotation={-30} />
                               
-                              {/* Final Bloom */}
+                              {/* Final Bloom (Positioned higher) */}
                               {step >= 3 && (
                                 <motion.g
-                                  initial={{ scale: 0, opacity: 0, rotate: -90 }}
-                                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                                  transition={{ duration: 1, delay: 0.5, type: "spring" }}
+                                  initial={{ scale: 0, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  transition={{ duration: 1, delay: 0.8, type: "spring" }}
                                 >
-                                  <circle cx="60" cy="40" r="12" fill="#fbbf24" className="filter blur-[2px]" />
+                                  <circle cx="175" cy="100" r="25" fill="#fbbf24" className="filter blur-[5px]" />
                                   <motion.circle 
-                                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0.9, 0.6] }}
                                     transition={{ duration: 2, repeat: Infinity }}
-                                    cx="60" cy="40" r="18" 
-                                    fill="url(#flowerGlow)" 
+                                    cx="175" cy="100" r="40" 
+                                    fill="url(#flowerGlowLarge)" 
                                   />
                                   <defs>
-                                    <radialGradient id="flowerGlow">
-                                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.6" />
+                                    <radialGradient id="flowerGlowLarge">
+                                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.8" />
                                       <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
                                     </radialGradient>
                                   </defs>
@@ -198,23 +198,23 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         )}
                       </AnimatePresence>
 
-                      {/* Carbon Token Appearance */}
+                      {/* Carbon Token Appearance (Floating higher) */}
                       <AnimatePresence>
                         {step >= 3 && (
                           <motion.div
-                            initial={{ y: 20, opacity: 0, scale: 0.5 }}
-                            animate={{ y: -80, opacity: 1, scale: 1 }}
-                            transition={{ duration: 1.2, ease: "easeOut" }}
-                            className="absolute inset-0 flex items-center justify-center"
+                            initial={{ y: 50, opacity: 0, scale: 0.5 }}
+                            animate={{ y: -450, opacity: 1, scale: 1.5 }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
                           >
                             <motion.div
                               animate={{ rotateY: 360 }}
                               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                              className="relative flex h-24 w-24 items-center justify-center"
+                              className="relative flex h-32 w-32 items-center justify-center"
                             >
-                              <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl animate-pulse" />
-                              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
-                                <Coins className="h-8 w-8 text-white" />
+                              <div className="absolute inset-0 rounded-full bg-emerald-500/30 blur-2xl animate-pulse" />
+                              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-[0_0_50px_rgba(16,185,129,0.6)]">
+                                <Coins className="h-12 w-12 text-white" />
                               </div>
                             </motion.div>
                           </motion.div>
@@ -222,14 +222,14 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                       </AnimatePresence>
                     </div>
 
-                    {/* Bottom Status Bar */}
-                    <div className="mt-auto pb-12 text-center">
+                    {/* Status Bar Overlay */}
+                    <div className="absolute top-12 w-full text-center">
                       <motion.div
-                        animate={{ opacity: [0.4, 1, 0.4] }}
+                        animate={{ opacity: [0.3, 0.7, 0.3] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className="text-[10px] font-mono text-emerald-500/60 uppercase tracking-widest"
+                        className="text-[12px] font-mono text-emerald-500/80 uppercase tracking-[0.2em] font-bold"
                       >
-                        {step < 4 ? "Processing_Neural_Verify..." : "Credit_Minted_Successfully"}
+                        {step < 4 ? "Analyzing_Farm_DNA..." : "Token_Generation_Complete"}
                       </motion.div>
                     </div>
                   </div>
