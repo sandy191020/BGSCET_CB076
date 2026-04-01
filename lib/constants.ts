@@ -1,6 +1,6 @@
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
-export const CHAIN_ID = 80001; // Polygon Mumbai
-export const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://rpc-mumbai.maticvigil.com";
+export const CHAIN_ID = 80002; // Polygon Amoy
+export const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "https://polygon-amoy.g.alchemy.com/v2/YOUR_API_KEY";
 export const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/";
 export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
@@ -67,4 +67,4 @@ export const DEMO_FARMS = [
   },
 ];
 
-export const EXPLORER_URL = "https://mumbai.polygonscan.com";
+export const EXPLORER_URL = "https://amoy.polygonscan.com";

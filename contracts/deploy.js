@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  console.log("Deploying GreenLedger contract to Polygon Mumbai testnet...");
+  console.log("Deploying GreenLedger contract to Polygon Amoy testnet...");
 
   const baseMetadataURI = "ipfs://QmYourBaseMetadataHash/";
 
@@ -14,7 +14,7 @@ async function main() {
 
   console.log("✅ GreenLedger deployed to:", contractAddress);
   console.log("📝 Save this address to your .env.local file as NEXT_PUBLIC_CONTRACT_ADDRESS");
-  console.log("🔗 View on PolygonScan:", `https://mumbai.polygonscan.com/address/${contractAddress}`);
+  console.log("🔗 View on PolygonScan:", `https://amoy.polygonscan.com/address/${contractAddress}`);
 }
 
 main()

@@ -5,6 +5,7 @@ import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, G
 import Link from "next/link";
 import { useState } from "react";
 import { CinematicDemo } from "@/components/CinematicDemo";
+import { AuctionBanner } from "@/components/AuctionBanner";
 
 export default function Home() {
   const [isDemoOpen, setIsDemoOpen] = useState(false);
@@ -23,6 +24,7 @@ export default function Home() {
 
   return (
     <div className="neural-grid min-h-screen pt-16">
+      <AuctionBanner />
       <CinematicDemo isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       {/* Hero Section */}
       <section className="relative overflow-hidden px-6 py-24 sm:py-32 lg:px-8">
@@ -63,7 +65,7 @@ export default function Home() {
             className="mt-10 flex items-center justify-center gap-x-6"
           >
             <Link
-              href="/auth/signup"
+              href="/verify"
               className="group flex items-center gap-2 rounded-full bg-emerald-600 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-500 hover:scale-105"
             >
               Start Earning

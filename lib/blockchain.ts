@@ -45,7 +45,7 @@ export async function mintCredits(
     const mockTxHash = `0x${Math.random().toString(16).substring(2, 66)}`;
     return {
       txHash: mockTxHash,
-      explorerUrl: `https://mumbai.polygonscan.com/tx/${mockTxHash}`,
+      explorerUrl: `https://amoy.polygonscan.com/tx/${mockTxHash}`,
     };
   }
 
@@ -57,7 +57,7 @@ export async function mintCredits(
 
   return {
     txHash: receipt.hash,
-    explorerUrl: `https://mumbai.polygonscan.com/tx/${receipt.hash}`,
+    explorerUrl: `https://amoy.polygonscan.com/tx/${receipt.hash}`,
   };
 }
 
@@ -70,7 +70,7 @@ export async function listForSale(
     const mockTxHash = `0x${Math.random().toString(16).substring(2, 66)}`;
     return {
       txHash: mockTxHash,
-      explorerUrl: `https://mumbai.polygonscan.com/tx/${mockTxHash}`,
+      explorerUrl: `https://amoy.polygonscan.com/tx/${mockTxHash}`,
     };
   }
 
@@ -83,7 +83,7 @@ export async function listForSale(
 
   return {
     txHash: receipt.hash,
-    explorerUrl: `https://mumbai.polygonscan.com/tx/${receipt.hash}`,
+    explorerUrl: `https://amoy.polygonscan.com/tx/${receipt.hash}`,
   };
 }
 
@@ -96,7 +96,7 @@ export async function buyCredits(
     const mockTxHash = `0x${Math.random().toString(16).substring(2, 66)}`;
     return {
       txHash: mockTxHash,
-      explorerUrl: `https://mumbai.polygonscan.com/tx/${mockTxHash}`,
+      explorerUrl: `https://amoy.polygonscan.com/tx/${mockTxHash}`,
     };
   }
 
@@ -109,7 +109,7 @@ export async function buyCredits(
 
   return {
     txHash: receipt.hash,
-    explorerUrl: `https://mumbai.polygonscan.com/tx/${receipt.hash}`,
+    explorerUrl: `https://amoy.polygonscan.com/tx/${receipt.hash}`,
   };
 }
 

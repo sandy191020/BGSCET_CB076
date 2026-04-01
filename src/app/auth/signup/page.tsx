@@ -16,6 +16,8 @@ export default function SignUp() {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
+  const [role, setRole] = useState<"farmer" | "supermarket">("farmer");
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -28,6 +30,7 @@ export default function SignUp() {
         options: {
           data: {
             full_name: fullName,
+            role: role,
           },
         },
       });
@@ -103,6 +106,34 @@ export default function SignUp() {
               {error}
             </motion.div>
           )}
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300 ml-1">I am a...</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setRole("farmer")}
+                className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                  role === "farmer"
+                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-400"
+                    : "bg-zinc-900/50 border-white/10 text-zinc-500 hover:border-white/20"
+                }`}
+              >
+                Farmer
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("supermarket")}
+                className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                  role === "supermarket"
+                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-400"
+                    : "bg-zinc-900/50 border-white/10 text-zinc-500 hover:border-white/20"
+                }`}
+              >
+                Supermarket
+              </button>
+            </div>
+          </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300 ml-1">Full Name</label>
