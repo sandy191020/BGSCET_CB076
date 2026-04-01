@@ -22,7 +22,7 @@ async function* mockVerificationStream(input: VerifyFarmRequest) {
     { step: 'Credit Calculation', message: '🧮  Computing carbon credit allocation...' },
     { step: 'Credit Calculation', message: `✅  Farm size: ${input.farmSizeAcres} acres × NDVI 0.82 × 5 = ${Math.floor(0.82 * input.farmSizeAcres * 5)} credits`, data: { creditAmount: Math.floor(0.82 * input.farmSizeAcres * 5) } },
     { step: 'Final Verdict', message: '⚖️   Generating cryptographic proof and final verdict...' },
-    { step: 'Final Verdict', message: `✅  APPROVED — ${Math.floor(0.82 * input.farmSizeAcres * 5)} carbon credits authorized for minting`, data: { approved: true, fraudRisk: 'low', ndviScore: 0.82 } },
+    { step: 'Final Verdict', message: `✅  APPROVED — ${Math.floor(0.82 * input.farmSizeAcres * 5)} carbon credits authorized for minting`, data: { approved: true, fraudRisk: 'low', ndviScore: 0.82, creditAmount: Math.floor(0.82 * input.farmSizeAcres * 5) } },
   ];
 
   for (const step of steps) {

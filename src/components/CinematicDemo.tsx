@@ -42,7 +42,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ 
+          animate={{
             opacity: 1,
             backgroundColor: step >= 4 ? "rgba(12, 10, 8, 0.99)" : "rgba(0, 0, 0, 0.99)"
           }}
@@ -65,7 +65,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
           </button>
 
           <div className="container relative mx-auto grid h-full max-w-7xl grid-cols-1 items-center gap-20 px-8 lg:grid-cols-2">
-            
+
             {/* Left Side: RBI-Style Premium Cards */}
             <div className="flex flex-col space-y-8">
               <AnimatePresence>
@@ -74,10 +74,10 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                     key={idx}
                     initial={{ opacity: 0, x: -80, rotateY: 30, filter: "blur(15px)", z: -100 }}
                     animate={{ opacity: 1, x: 0, rotateY: 0, filter: "blur(0px)", z: 0 }}
-                    transition={{ 
-                      duration: 1.5, 
+                    transition={{
+                      duration: 1.5,
                       delay: idx * 0.2,
-                      ease: [0.19, 1, 0.22, 1] 
+                      ease: [0.19, 1, 0.22, 1]
                     }}
                     className="perspective-1000"
                   >
@@ -88,7 +88,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"
                       />
-                      
+
                       <div className="flex items-center gap-8">
                         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                           {feature.icon}
@@ -108,7 +108,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
             <div className="relative flex items-center justify-center">
               {/* Cinematic Halo */}
               <motion.div
-                animate={step >= 4 ? { 
+                animate={step >= 4 ? {
                   scale: [1, 1.2, 1],
                   opacity: [0.3, 0.5, 0.3],
                 } : { opacity: 0 }}
@@ -123,7 +123,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                 className="group relative z-10 h-[800px] w-[390px] overflow-hidden rounded-[4rem] bg-zinc-950 p-[14px] shadow-[0_40px_100px_rgba(0,0,0,1)] ring-[16px] ring-zinc-900/80 transition-transform hover:rotateY-[-5deg]"
               >
                 <div className="absolute inset-0 bg-black overflow-hidden pointer-events-none">
-                  
+
                   {/* Scene Layer 1: Soil (Base) */}
                   <AnimatePresence>
                     {step >= 1 && (
@@ -133,10 +133,10 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         transition={{ duration: 3 }}
                         className="absolute inset-0"
                       >
-                        <Image 
-                          src="/assets/cinematic/soil_seed.png" 
-                          alt="Soil" 
-                          fill 
+                        <Image
+                          src="/assets/cinematic/soil_seed.png"
+                          alt="Soil"
+                          fill
                           className="object-cover opacity-80"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/80" />
@@ -154,17 +154,17 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1] }}
                         className="absolute inset-0 z-20 mix-blend-screen"
                       >
-                        <Image 
-                          src="/assets/cinematic/water.png" 
-                          alt="Water" 
-                          fill 
+                        <Image
+                          src="/assets/cinematic/water.png"
+                          alt="Water"
+                          fill
                           className="object-cover scale-150"
                         />
                         {/* Macro absorption flare */}
-                        <motion.div 
+                        <motion.div
                           animate={{ opacity: [0, 0.4, 0], scale: [0.8, 1.2, 1] }}
                           transition={{ duration: 2 }}
-                          className="absolute bottom-1/4 left-1/2 -translate-x-1/2 h-32 w-32 rounded-full bg-blue-400/20 blur-3xl" 
+                          className="absolute bottom-1/4 left-1/2 -translate-x-1/2 h-32 w-32 rounded-full bg-blue-400/20 blur-3xl"
                         />
                       </motion.div>
                     )}
@@ -175,8 +175,8 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                     {step >= 4 && (
                       <motion.div
                         initial={{ opacity: 0, y: 100, scale: 0.8 }}
-                        animate={{ 
-                          opacity: step === 4 ? 1 : 0, 
+                        animate={{
+                          opacity: step === 4 ? 1 : 0,
                           y: step === 4 ? 0 : -50,
                           scale: step === 4 ? 1 : 1.2,
                           filter: step === 4 ? "blur(0px)" : "blur(10px)"
@@ -184,10 +184,10 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         transition={{ duration: 3, ease: "easeInOut" }}
                         className="absolute inset-0 z-30"
                       >
-                        <Image 
-                          src="/assets/cinematic/sprout.png" 
-                          alt="Sprout" 
-                          fill 
+                        <Image
+                          src="/assets/cinematic/sprout.png"
+                          alt="Sprout"
+                          fill
                           className="object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -204,17 +204,17 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         transition={{ duration: 5, ease: [0.4, 0, 0.2, 1] }}
                         className="absolute inset-0 z-40"
                       >
-                        <Image 
-                          src="/assets/cinematic/full_plant.png" 
-                          alt="Plant" 
-                          fill 
+                        <Image
+                          src="/assets/cinematic/full_plant.png"
+                          alt="Plant"
+                          fill
                           className="object-cover"
                         />
                         {/* Sun glare bloom */}
-                        <motion.div 
+                        <motion.div
                           animate={{ opacity: [0, 0.3, 0.1], x: [-100, 0] }}
                           transition={{ duration: 6 }}
-                          className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-orange-400/20 blur-[100px]" 
+                          className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-orange-400/20 blur-[100px]"
                         />
                       </motion.div>
                     )}
@@ -230,20 +230,20 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                         className="absolute inset-0 z-50 flex items-center justify-center"
                       >
                         <motion.div
-                          animate={{ 
+                          animate={{
                             rotateY: 360,
                             y: [0, -15, 0]
                           }}
-                          transition={{ 
+                          transition={{
                             rotateY: { duration: 15, repeat: Infinity, ease: "linear" },
                             y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                           }}
                           className="relative h-64 w-64 select-none"
                         >
-                          <Image 
-                            src="/assets/cinematic/token.png" 
-                            alt="Carbon Token" 
-                            fill 
+                          <Image
+                            src="/assets/cinematic/token.png"
+                            alt="Carbon Token"
+                            fill
                             className="object-contain drop-shadow-[0_0_40px_rgba(16,185,129,0.6)]"
                           />
                           <div className="absolute inset-0 bg-emerald-400/10 blur-[60px] animate-pulse rounded-full" />
@@ -256,19 +256,19 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                   {step >= 4 && [...Array(12)].map((_, i) => (
                     <motion.div
                       key={i}
-                      animate={{ 
+                      animate={{
                         y: [-20, -600],
                         x: [0, Math.random() * 100 - 50],
                         opacity: [0, 0.4, 0],
                         scale: [0.5, 1.2, 0.5]
                       }}
-                      transition={{ 
-                        duration: 8 + Math.random() * 5, 
+                      transition={{
+                        duration: 8 + Math.random() * 5,
                         repeat: Infinity,
                         delay: Math.random() * 5
                       }}
                       className="absolute h-1 w-1 z-20 rounded-full bg-orange-200/20"
-                      style={{ 
+                      style={{
                         left: `${Math.random() * 100}%`,
                         bottom: '20%'
                       }}
@@ -278,7 +278,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                   {/* Status Scrubber */}
                   <div className="absolute bottom-12 w-full px-12">
                     <div className="h-[2px] w-full bg-white/5 relative">
-                      <motion.div 
+                      <motion.div
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: step / 7 }}
                         className="absolute inset-0 bg-emerald-500 origin-left"

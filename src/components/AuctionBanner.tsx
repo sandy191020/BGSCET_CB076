@@ -35,8 +35,9 @@ export function AuctionBanner() {
     fetchAuction();
     
     // Subscribe to changes
+    const channelId = `banner_updates_${Math.random().toString(36).slice(2)}`;
     const channel = supabase
-      .channel(`banner_updates_${Math.random()}`)
+      .channel(channelId)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'auctions' }, fetchAuction)
       .subscribe();
 

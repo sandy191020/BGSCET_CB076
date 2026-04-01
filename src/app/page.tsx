@@ -11,6 +11,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function LandingPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
@@ -57,7 +58,7 @@ export default function LandingPage() {
         {/* Cinematic Hero */}
         <section className="relative h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 opacity-40">
-            <CinematicDemo isOpen={true} onClose={() => {}} />
+            <CinematicDemo isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black z-[5]" />
           
