@@ -10,6 +10,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Define routes where we want to hide the global navbar and banner
   const isAppPage = pathname?.startsWith("/dashboard") || 
                     pathname?.startsWith("/admin") || 
+                    pathname?.startsWith("/marketplace") || 
+                    pathname?.startsWith("/verify") || 
                     pathname?.startsWith("/auction/");
 
   return (

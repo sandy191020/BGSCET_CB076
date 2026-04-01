@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Satellite, Leaf, ArrowRight, CheckCircle, ExternalLink, Upload, RotateCcw } from "lucide-react";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { AgentReasoning } from "../components/AgentReasoning";
 import { DEMO_FARMS } from "../../../lib/constants";
 import type { Farm, AgentResult } from "../../../lib/types";
+import { AppShell } from "@/components/AppShell";
 
 // Dynamic import to avoid SSR issues with Leaflet
 const FarmMap = dynamic(
@@ -211,13 +212,12 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-16">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-
+    <AppShell>
+      <div className="p-8 max-w-7xl mx-auto space-y-8">
         {/* Page Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Farm Verification</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-white uppercase tracking-tighter">Farm Verification</h1>
             <p className="mt-1 text-sm text-zinc-500">
               Select a farm → AI verifies via satellite → Mint your carbon credits
             </p>
@@ -234,7 +234,7 @@ export default function VerifyPage() {
         </div>
 
         {/* Step Progress Bar */}
-        <div className="mb-8">
+        <div className="w-full">
           <div className="flex items-center gap-0">
             {STEPS.map((s, i) => (
               <div key={s} className="flex items-center flex-1 last:flex-none">
@@ -250,7 +250,7 @@ export default function VerifyPage() {
                   >
                     {i < stepIndex ? <CheckCircle className="h-4 w-4" /> : i + 1}
                   </div>
-                  <span className={`text-xs font-medium whitespace-nowrap ${i <= stepIndex ? "text-emerald-400" : "text-zinc-600"}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${i <= stepIndex ? "text-emerald-400" : "text-zinc-600"}`}>
                     {s}
                   </span>
                 </div>
@@ -263,13 +263,13 @@ export default function VerifyPage() {
         </div>
 
         {/* Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-320px)] min-h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
           {/* Left: Farm Selector + Map */}
           <div className="lg:col-span-3 flex flex-col gap-4">
 
             {/* Farm selector tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {DEMO_FARMS.map((farm) => (
                 <button
                   key={farm.id}
@@ -305,118 +305,11 @@ export default function VerifyPage() {
               </button>
             </div>
 
-            {/* Custom Location Form */}
-            {isCustomLoc && (
-              <div className="flex flex-col gap-3 bg-zinc-900 p-4 rounded-xl border border-white/10">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-emerald-400">Custom Coordinates</span>
-                  <button
-                    onClick={() => {
-                      if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                          (pos) => {
-                            setCustomLat(pos.coords.latitude.toFixed(6));
-                            setCustomLng(pos.coords.longitude.toFixed(6));
-                          },
-                          (err) => console.warn(err)
-                        );
-                      }
-                    }}
-                    className="flex items-center gap-1.5 text-[11px] font-medium text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 px-2.5 py-1 rounded-md transition-colors"
-                  >
-                    📍 Get Current Location
-                  </button>
-                </div>
-                
-                {/* Search Bar */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Search location (e.g., Bangalore)..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSearchLocation();
-                    }}
-                    className="flex-1 bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  />
-                  <button
-                    onClick={handleSearchLocation}
-                    disabled={isSearching || !searchQuery.trim()}
-                    className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 hover:text-white border border-white/10 transition-colors px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    {isSearching ? "..." : "Search"}
-                  </button>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex-1 space-y-1">
-                    <label className="text-xs text-zinc-500">Latitude</label>
-                    <input
-                      type="number"
-                      value={customLat}
-                      onChange={(e) => setCustomLat(e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-                    />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <label className="text-xs text-zinc-500">Longitude</label>
-                    <input
-                      type="number"
-                      value={customLng}
-                      onChange={(e) => setCustomLng(e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-                    />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <label className="text-xs text-zinc-500">Size (Acres)</label>
-                    <input
-                      type="number"
-                      value={customSize}
-                      onChange={(e) => setCustomSize(e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      onClick={() => {
-                        const lat = parseFloat(customLat) || 0;
-                        const lng = parseFloat(customLng) || 0;
-                        // Generate a small square polygon mock around the center
-                        const offset = 0.001 * Math.sqrt(parseFloat(customSize) || 1);
-                        setSelectedFarm({
-                          id: Date.now(),
-                          name: "Custom Farm",
-                          sizeAcres: parseFloat(customSize) || 1,
-                          ownerId: "custom_farmer_001",
-                          verified: false,
-                          coordinates: {
-                            lat,
-                            lng,
-                            polygon: [
-                              [lng - offset, lat + offset],
-                              [lng + offset, lat + offset],
-                              [lng + offset, lat - offset],
-                              [lng - offset, lat - offset],
-                              [lng - offset, lat + offset]
-                            ] as [number, number][]
-                          }
-                        });
-                      }}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white border border-white/10 transition-colors px-4 py-2 h-[38px] rounded-lg text-sm font-medium w-full sm:w-auto"
-                    >
-                      Set on Map
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Map */}
-            <div className="flex-1">
+            <div className="rounded-[2rem] border border-white/5 bg-[#080808] relative min-h-[400px]">
               <FarmMap 
                 selectedFarm={selectedFarm} 
-                className="h-full min-h-[340px]" 
+                className="h-full w-full" 
                 verificationStep={step}
                 ndviScore={agentResult?.ndviScore ?? selectedFarm?.ndviScore}
               />
@@ -424,13 +317,12 @@ export default function VerifyPage() {
 
             {/* Verify button */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               onClick={handleVerify}
               disabled={!selectedFarm || step === "verifying" || step === "minting"}
-              className="relative flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white shadow-xl shadow-emerald-900/40 transition-all hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden group"
+              className="relative flex w-full items-center justify-center gap-3 rounded-2xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white shadow-xl shadow-emerald-900/40 transition-all hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               {step === "verifying" ? (
                 <>
                   <motion.div
@@ -451,7 +343,7 @@ export default function VerifyPage() {
           </div>
 
           {/* Right: Agent Reasoning Panel */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="lg:col-span-2 flex flex-col gap-6">
             <AgentReasoning
               lines={reasoningLines}
               isLoading={step === "verifying"}
@@ -466,17 +358,12 @@ export default function VerifyPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-3"
                 >
-                  {mintError && (
-                    <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-red-400">
-                      ❌ {mintError}
-                    </div>
-                  )}
                   <button
                     onClick={handleMint}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 hover:text-emerald-300"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black px-6 py-4 text-sm font-bold transition-all hover:bg-emerald-400 uppercase tracking-widest"
                   >
                     <Upload className="h-4 w-4" />
-                    Mint {agentResult.creditAmount} Credits on Polygon
+                    Mint {agentResult.creditAmount} Credits
                   </button>
                 </motion.div>
               )}
@@ -488,34 +375,25 @@ export default function VerifyPage() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-4"
+                  className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-6 space-y-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-white text-sm">Credits Minted!</div>
-                      <div className="text-xs text-zinc-500 font-mono mt-0.5 truncate max-w-[200px]">{txHash.slice(0, 20)}...</div>
-                    </div>
+                  <div className="flex items-center gap-3 font-bold text-white text-sm uppercase tracking-widest text-emerald-500">
+                    <CheckCircle className="h-5 w-5" />
+                    Credits Successfully Minted
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <a
-                      href={`https://amoy.polygonscan.com/tx/${txHash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 rounded-xl bg-zinc-800 border border-white/10 px-4 py-2.5 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View on Polygonscan
-                    </a>
+                  <div className="bg-black rounded-xl p-4 border border-white/5 space-y-2">
+                    <p className="text-[10px] font-mono text-zinc-500 uppercase">Transaction Hash</p>
+                    <p className="text-[10px] font-mono text-emerald-400 break-all">{txHash}</p>
+                  </div>
+
+                  <div className="flex gap-2">
                     <Link
                       href="/marketplace"
-                      className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600/80 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:bg-emerald-600"
+                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black px-4 py-3 text-xs font-bold transition-all hover:bg-emerald-400 uppercase tracking-widest"
                     >
-                      <ArrowRight className="h-3.5 w-3.5" />
-                      View on Marketplace
+                      <Gavel className="h-4 w-4" />
+                      Trade on Market
                     </Link>
                   </div>
                 </motion.div>
@@ -524,6 +402,8 @@ export default function VerifyPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
+
+import { Gavel } from "lucide-react";

@@ -40,15 +40,7 @@ export function Navbar() {
         <div className="flex items-center gap-8">
           {user ? (
             <>
-              {/* Logged In View - Show Full Nav + Dashboard + Sign Out */}
-              <div className="hidden md:flex items-center gap-8">
-                <Link href="/#problem" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">The Problem</Link>
-                <Link href="/#how-it-works" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">How it Works</Link>
-                <Link href="/verify" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">Verify Farm</Link>
-                <Link href="/marketplace" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">Marketplace</Link>
-                <Link href="/admin" className="text-sm font-mono text-emerald-500/50 hover:text-emerald-400 transition-colors px-2 py-1 rounded border border-emerald-500/10 bg-emerald-500/5 uppercase tracking-widest text-[10px]">Admin_Portal</Link>
-              </div>
-
+              {/* Logged In View - Show only Dashboard + Sign Out on landing page */}
               <div className="flex items-center gap-4">
                 <Link href="/dashboard" className="text-sm font-medium text-zinc-200 hover:text-emerald-500 transition-colors flex items-center gap-2">
                   <User className="h-4 w-4" />

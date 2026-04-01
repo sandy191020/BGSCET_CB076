@@ -1,26 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MapContainer } from "@/components/map/MapContainer";
 import { AnalysisPanel } from "@/components/dashboard/AnalysisPanel";
 import { motion } from "framer-motion";
 import { 
-  Wallet, Satellite, BarChart3, Settings, LogOut, 
-  LayoutDashboard, HelpCircle, ShieldAlert, Gavel, 
-  Leaf, X, Globe, User, Bell, Fingerprint
+  Wallet, Satellite, BarChart3, Fingerprint, ShieldAlert, X, Bell, User, Globe, HelpCircle
 } from "lucide-react";
-import Link from "next/link";
-import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { AppShell } from "@/components/AppShell";
 
 export default function Dashboard() {
-  const router = useRouter();
   const [analyzing, setAnalyzing] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [coords, setCoords] = useState<{ lng: number; lat: number } | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
 
   const startAnalysis = async () => {
     if (!coords) return;
@@ -43,90 +37,26 @@ export default function Dashboard() {
     setStatus(null);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
-  };
-
   const reasoning = "AI confirmed dense, healthy vegetation (NDVI: 0.82). No industrial pesticide patterns detected. High carbon sequestration potential verified via Sentinel-2 satellite data.";
 
   return (
-    <div className="flex h-screen bg-[#050505] text-white">
-      {/* Sidebar */}
-      <aside className="w-72 border-r border-white/5 p-6 flex flex-col bg-[#080808]">
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
-            <Leaf className="h-5 w-5" />
-          </div>
-          <span className="font-bold text-lg tracking-tight">GreenLedger</span>
-        </div>
-
-        <div className="flex-1 space-y-8 overflow-y-auto">
-          {/* Main Navigation */}
-          <div>
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-4 px-2">Marketplace_Core</p>
-            <nav className="space-y-1">
-              <NavItem icon={<LayoutDashboard className="h-4 w-4" />} label="Overview" active />
-              <NavItem href="/#problem" icon={<ShieldAlert className="h-4 w-4" />} label="The Problem" />
-              <NavItem href="/#how-it-works" icon={<HelpCircle className="h-4 w-4" />} label="How It Works" />
-              <NavItem icon={<Satellite className="h-4 w-4" />} label="Verify Farm" />
-              <NavItem href="/marketplace" icon={<Globe className="h-4 w-4" />} label="Marketplace" />
-              <NavItem href="/admin/dashboard" icon={<Gavel className="h-4 w-4" />} label="Admin_Portal" />
-            </nav>
-          </div>
-
-          {/* Wallet & Credits */}
-          <div>
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-4 px-2">Assets_Wallet</p>
-            <nav className="space-y-1">
-              <NavItem icon={<Wallet className="h-4 w-4" />} label="Carbon Wallet" />
-              <NavItem icon={<BarChart3 className="h-4 w-4" />} label="Analytics" />
-            </nav>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="mt-auto pt-6 space-y-1 border-t border-white/5">
-          <button 
-            onClick={() => setShowSettings(true)}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </button>
-          <button 
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/5 transition-all"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto p-8 relative">
-        <div className="mb-8 flex items-center justify-between max-w-7xl mx-auto">
+    <AppShell>
+      <div className="p-8 space-y-8 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-black tracking-tighter uppercase mb-1">Farm Verification</h1>
             <p className="text-sm text-zinc-500 font-mono">NODE_STATUS: <span className="text-emerald-500">ACTIVE_HEALTHY</span> // SATELLITE: SENTINEL-2</p>
           </div>
-          <div className="flex items-center gap-4">
-            {status && (
-              <div className="text-[10px] font-mono text-emerald-400 animate-pulse px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 uppercase tracking-widest">
-                {status}
-              </div>
-            )}
-            <div className="h-10 w-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
-              <User className="h-5 w-5 text-zinc-400" />
+          {status && (
+            <div className="text-[10px] font-mono text-emerald-400 animate-pulse px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 uppercase tracking-widest">
+              {status}
             </div>
-          </div>
+          )}
         </div>
 
-        <div className="grid h-[calc(100vh-180px)] grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Map Column */}
-          <div className="lg:col-span-2 rounded-[2rem] overflow-hidden border border-white/5 bg-[#080808] relative">
+          <div className="lg:col-span-2 rounded-[2rem] overflow-hidden border border-white/5 bg-[#080808] relative min-h-[500px]">
              <MapContainer 
               onCoordsSelect={(lng, lat) => {
                 setCoords({ lng, lat });
@@ -186,68 +116,30 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </main>
 
-      {/* Settings Modal */}
-      {showSettings && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-xl"
-            onClick={() => setShowSettings(false)}
-          />
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="relative w-full max-w-xl glass rounded-[2.5rem] border-white/10 p-8 shadow-2xl"
-          >
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-black uppercase tracking-tighter">System Settings</h2>
-              <button onClick={() => setShowSettings(false)} className="h-10 w-10 rounded-full hover:bg-white/5 flex items-center justify-center">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              <SettingsOption icon={<Bell className="h-5 w-5" />} title="Notifications" desc="Manage alerts for auction starts and trade updates." />
-              <SettingsOption icon={<ShieldAlert className="h-5 w-5" />} title="Security" desc="Multi-signature wallet and 2FA configurations." />
-              <SettingsOption icon={<Globe className="h-5 w-5" />} title="Region" desc="Set your primary agricultural zone for credit calculations." />
-            </div>
-
-            <button 
-              onClick={() => setShowSettings(false)}
-              className="w-full mt-10 bg-white text-black py-4 rounded-2xl font-bold hover:bg-emerald-400 transition-colors uppercase tracking-widest text-sm"
-            >
-              Save Changes
-            </button>
-          </motion.div>
+        {/* Action Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatWidget icon={<Wallet />} label="Carbon Wallet" value="1,240.50 GRC" trend="+12.5% this month" />
+          <StatWidget icon={<Satellite />} label="Verified Land" value="45.2 Hectares" trend="3 active plots" />
+          <StatWidget icon={<BarChart3 />} label="Impact Score" value="0.92 NDVI" trend="Exceeding targets" />
         </div>
-      )}
-    </div>
-  );
-}
-
-function NavItem({ icon, label, active = false, href = "#" }: { icon: React.ReactNode, label: string, active?: boolean, href?: string }) {
-  return (
-    <Link href={href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-      active ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'text-zinc-500 hover:text-white hover:bg-white/5'
-    }`}>
-      {icon}
-      {label}
-    </Link>
-  );
-}
-
-function SettingsOption({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
-  return (
-    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer group">
-      <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-black transition-colors">
-        {icon}
       </div>
-      <div>
-        <h4 className="font-bold text-white mb-0.5">{title}</h4>
-        <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
+    </AppShell>
+  );
+}
+
+function StatWidget({ icon, label, value, trend }: { icon: React.ReactNode, label: string, value: string, trend: string }) {
+  return (
+    <div className="glass p-6 rounded-2xl border-white/5 hover:border-emerald-500/20 transition-all group">
+      <div className="flex items-center justify-between mb-4">
+        <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+          {icon}
+        </div>
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{label}</span>
+      </div>
+      <div className="space-y-1">
+        <p className="text-2xl font-bold text-white">{value}</p>
+        <p className="text-xs text-emerald-500 flex items-center gap-1">{trend}</p>
       </div>
     </div>
   );
