@@ -61,7 +61,25 @@ export async function POST(req: NextRequest) {
     }
 
     // Real blockchain minting
-    const { mintCredits } = await import('../../../../lib/blockchain');
+    const { mintCarbonCredit } = await import('@/lib/blockchain/mint');
+    const { createServerClient } = await import('@supabase/ssr');
+    const { cookies } = await import('next/headers');
+
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+          },
+        },
+      }
+    );
 
     // Credit score: convert ndviScore (0-1) to (0-100)
     const creditScore = Math.round(agentVerdict.ndviScore * 100);
@@ -71,22 +89,54 @@ export async function POST(req: NextRequest) {
       ? farmerId
       : '0x0000000000000000000000000000000000000001';
 
-    const result = await mintCredits(
+    const result = await mintCarbonCredit(
       farmerAddress,
-      farmId,
-      creditAmount,
-      satelliteHash,
-      creditScore
+      agentVerdict.ndviScore,
+      satelliteHash
     );
+
+    // PERSIST TO SUPABASE
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('carbon_credits, full_name')
+      .eq('id', farmerId)
+      .single();
+
+    await supabase
+      .from('profiles')
+      .update({ 
+        carbon_credits: (profile?.carbon_credits || 0) + creditAmount 
+      })
+      .eq('id', farmerId);
+
+    // CREATE MARKETPLACE LISTING
+    const { error: listingError } = await supabase
+      .from('carbon_listings')
+      .insert({
+        farmer_id: farmerId,
+        token_id: farmId,
+        amount: creditAmount,
+        price_per_credit: 850, // Default price in MATIC or INR
+        status: 'available',
+        farm_id: farmId,
+        farm_name: (body as any).farmName || profile?.full_name || `Farm #${farmId}`,
+        ndvi_score: creditScore / 100,
+        image_hash: satelliteHash,
+        seller_address: farmerAddress
+      });
+
+    if (listingError) {
+      console.error('[mint-token] Listing Error:', listingError);
+    }
 
     // RECORD the submission after the real blockchain transaction
     recordSubmission(farmerId, farmCoordinates);
 
     return NextResponse.json({
-      txHash: result.txHash,
+      txHash: result.transactionHash,
       tokenId: farmId,
       creditAmount,
-      explorerUrl: result.explorerUrl,
+      explorerUrl: `${EXPLORER_URL}/tx/${result.transactionHash}`,
     });
   } catch (error: any) {
     console.error('[mint-token] Error:', error);

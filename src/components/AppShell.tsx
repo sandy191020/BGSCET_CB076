@@ -114,7 +114,8 @@ export function AppShell({ children, hideSidebar = false }: AppShellProps) {
       items: [
         { name: "Overview", icon: <LayoutDashboard />, href: "/dashboard" },
         { name: "Verify Farm", icon: <Satellite />, href: "/verify" },
-        { name: "Marketplace", icon: <Gavel />, href: "/marketplace" },
+        { name: "Marketplace", icon: <Globe />, href: "/marketplace" },
+        { name: "Auction Exchange", icon: <Gavel />, href: "/auction" },
         { name: "Admin_Portal", icon: <ShieldAlert />, href: "/admin", adminOnly: true },
       ]
     },

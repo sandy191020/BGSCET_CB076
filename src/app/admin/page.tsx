@@ -404,12 +404,18 @@ function AnnouncementsTab() {
 
 function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAuctions: () => void }) {
   const [isAdding, setIsAdding] = useState(false);
+  const [farmers, setFarmers] = useState<any[]>([]);
   const [formData, setFormData] = useState({ 
     title: '', 
     category: 'crops', 
     startingPrice: '',
+    farmerId: '',
     scheduledAt: new Date(Date.now() + 86400000).toISOString().slice(0, 16)
   });
+
+  useEffect(() => {
+     supabase.from('profiles').select('id, full_name').then(({ data }) => setFarmers(data || []));
+  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,6 +424,7 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
       type: formData.category,
       min_price: Number(formData.startingPrice),
       max_price: Number(formData.startingPrice) * 1.3, // 30% regulation cap
+      farmer_id: formData.farmerId || null,
       status: 'scheduled',
       scheduled_at: new Date(formData.scheduledAt).toISOString()
     }]);
@@ -435,6 +442,7 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
         title: '', 
         category: 'crops', 
         startingPrice: '',
+        farmerId: '',
         scheduledAt: new Date(Date.now() + 86400000).toISOString().slice(0, 16)
       });
       fetchAuctions();
@@ -476,7 +484,7 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
         {isAdding && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
              <div className="glass rounded-[2rem] border border-emerald-500/20 bg-emerald-500/5 p-10 mb-8">
-                <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
+                <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 items-end">
                    <div className="space-y-2 lg:col-span-1">
                       <label className="text-[10px] font-black uppercase tracking-widest text-emerald-500/70">Auction_Title</label>
                       <input 
@@ -497,6 +505,20 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
                       >
                          <option value="crops">Crop Auction</option>
                          <option value="carbon">Carbon Credit</option>
+                      </select>
+                   </div>
+                   <div className="space-y-2 lg:col-span-1">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-emerald-500/70">Farmer Allocation</label>
+                      <select 
+                        value={formData.farmerId}
+                        onChange={e => setFormData({...formData, farmerId: e.target.value})}
+                        className="w-full bg-zinc-950 border border-white/5 rounded-xl px-5 py-3 text-xs text-white uppercase font-black"
+                        required
+                      >
+                         <option value="">Select Farmer...</option>
+                         {farmers.map(f => (
+                            <option key={f.id} value={f.id}>{f.full_name}</option>
+                         ))}
                       </select>
                    </div>
                    <div className="space-y-2 lg:col-span-1">
@@ -528,58 +550,82 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
         )}
       </AnimatePresence>
 
-      <div className="glass rounded-[2.5rem] border border-white/5 bg-zinc-950/20 overflow-x-auto">
-         <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead className="bg-zinc-950/80 border-b border-white/5 whitespace-nowrap">
-               <tr>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Signal_UID</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Exchange_Entity</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Status_Node</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Valuation_Floor</th>
-                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500 text-right">Actions</th>
-               </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-               {auctions.map(a => (
-                 <tr key={a.id} className="group hover:bg-white/[0.02] transition-colors">
-                    <td className="px-8 py-6 font-mono text-[9px] text-zinc-600 uppercase tracking-tighter">#{a.id.slice(0,8)}</td>
-                    <td className="px-8 py-6">
-                       <p className="text-xs font-black text-white uppercase tracking-tight">{a.title}</p>
-                       <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{a.type}</p>
-                    </td>
-                    <td className="px-8 py-6">
-                       <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[9px] font-black uppercase ${
+      {/* Sub-tabs: Active vs History */}
+      {(() => {
+        const [viewMode, setViewMode] = React.useState<'active' | 'history'>('active');
+        const active = auctions.filter(a => a.status !== 'completed');
+        const history = auctions.filter(a => a.status === 'completed');
+        const displayed = viewMode === 'active' ? active : history;
+        return (
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <button onClick={() => setViewMode('active')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${ viewMode === 'active' ? 'bg-emerald-500 text-black' : 'bg-zinc-900 text-zinc-500 hover:text-white border border-white/5' }`}>
+                Active &amp; Scheduled ({active.length})
+              </button>
+              <button onClick={() => setViewMode('history')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${ viewMode === 'history' ? 'bg-emerald-500 text-black' : 'bg-zinc-900 text-zinc-500 hover:text-white border border-white/5' }`}>
+                History / Settled ({history.length})
+              </button>
+            </div>
+
+            <div className="glass rounded-[2.5rem] border border-white/5 bg-zinc-950/20 overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead className="bg-zinc-950/80 border-b border-white/5 whitespace-nowrap">
+                  <tr>
+                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Signal_UID</th>
+                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Exchange_Entity</th>
+                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Status_Node</th>
+                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">{viewMode === 'history' ? 'Winner_Node' : 'Valuation_Floor'}</th>
+                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {displayed.length === 0 ? (
+                    <tr><td colSpan={5} className="px-8 py-16 text-center text-zinc-600 font-black uppercase tracking-widest text-xs">No Records Found</td></tr>
+                  ) : displayed.map(a => (
+                    <tr key={a.id} className="group hover:bg-white/[0.02] transition-colors">
+                      <td className="px-8 py-6 font-mono text-[9px] text-zinc-600 uppercase tracking-tighter">#{a.id.slice(0,8)}</td>
+                      <td className="px-8 py-6">
+                        <p className="text-xs font-black text-white uppercase tracking-tight">{a.title}</p>
+                        <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{a.type}</p>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[9px] font-black uppercase ${
                           a.status === 'live' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                           a.status === 'scheduled' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
                           'bg-zinc-900 text-zinc-500 border-white/10'
-                       }`}>
+                        }`}>
                           <div className={`h-1 w-1 rounded-full ${a.status === 'live' ? 'bg-emerald-500 animate-pulse' : 'bg-current'}`} />
                           {a.status}
-                       </div>
-                    </td>
-                    <td className="px-8 py-6 text-xs font-black text-white italic">₹{a.min_price.toLocaleString()}</td>
-                    <td className="px-8 py-6 text-right whitespace-nowrap">
-                       <div className="flex items-center justify-end gap-3">
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        {viewMode === 'history' ? (
+                          a.highestBid ? (
+                            <div>
+                              <p className="text-xs font-black text-emerald-400 uppercase tracking-tight">{a.highestBid.profiles?.full_name || 'Anonymous'}</p>
+                              <p className="text-[10px] font-bold text-zinc-500">₹{a.highestBid.amount?.toLocaleString()} final</p>
+                            </div>
+                          ) : <span className="text-[10px] text-zinc-600 uppercase font-bold">No Bids</span>
+                        ) : (
+                          <span className="text-xs font-black text-white italic">₹{a.min_price.toLocaleString()}</span>
+                        )}
+                      </td>
+                      <td className="px-8 py-6 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-3">
                           {a.status === 'scheduled' && <button onClick={() => updateStatus(a.id, 'live')} className="h-9 w-9 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all"><Play className="h-4 w-4" /></button>}
-                          {a.status === 'live' && <button onClick={() => updateStatus(a.id, 'completed')} className="h-9 w-9 shrink-0 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center hover:bg-blue-500 hover:text-black transition-all font-black text-[9px]">DONE</button>}
-                          
-                          {a.status === 'completed' && a.highestBid && (
-                              <div className="text-right ml-4 border-r border-white/10 pr-4">
-                                  <p className="text-[10px] font-black uppercase text-emerald-500 tracking-tighter leading-none mb-1">
-                                    WINNER: {a.highestBid.profiles?.full_name || 'Anonymous'}
-                                  </p>
-                                  <p className="text-[8px] font-bold text-zinc-500">{a.highestBid.profiles?.email}</p>
-                              </div>
-                          )}
-
+                          {a.status === 'live' && <button onClick={() => updateStatus(a.id, 'completed')} className="h-9 px-3 shrink-0 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center hover:bg-blue-500 hover:text-black transition-all font-black text-[9px] uppercase">Close</button>}
+                          {viewMode === 'active' && <Link href={`/auction/${a.id}`} className="h-9 w-9 shrink-0 rounded-xl bg-zinc-800 text-zinc-400 border border-white/5 flex items-center justify-center hover:text-white transition-all"><Eye className="h-4 w-4" /></Link>}
                           <button onClick={() => deleteAuction(a.id)} className="h-9 w-9 shrink-0 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><Trash2 className="h-4 w-4" /></button>
-                       </div>
-                    </td>
-                 </tr>
-               ))}
-            </tbody>
-         </table>
-      </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })()}
     </motion.div>
   );
 }

@@ -44,7 +44,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ 
+          animate={{
             opacity: 1,
             backgroundColor: "rgba(15, 23, 42, 0.95)"
           }}
@@ -125,7 +125,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
             <div className="relative flex items-center justify-center">
               {/* Cinematic Halo */}
               <motion.div
-                animate={step >= 4 ? { 
+                animate={step >= 4 ? {
                   scale: [1, 1.2, 1],
                   opacity: [0.3, 0.5, 0.3],
                 } : { opacity: 0 }}
@@ -169,19 +169,19 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                   {step >= 4 && [...Array(12)].map((_, i) => (
                     <motion.div
                       key={i}
-                      animate={{ 
+                      animate={{
                         y: [-20, -600],
                         x: [0, Math.random() * 100 - 50],
                         opacity: [0, 0.4, 0],
                         scale: [0.5, 1.2, 0.5]
                       }}
-                      transition={{ 
-                        duration: 8 + Math.random() * 5, 
+                      transition={{
+                        duration: 8 + Math.random() * 5,
                         repeat: Infinity,
                         delay: Math.random() * 5
                       }}
                       className="absolute h-1 w-1 z-20 rounded-full bg-orange-200/20"
-                      style={{ 
+                      style={{
                         left: `${Math.random() * 100}%`,
                         bottom: '20%'
                       }}
@@ -191,7 +191,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                   {/* Status Scrubber */}
                   <div className="absolute bottom-12 w-full px-12">
                     <div className="h-[2px] w-full bg-white/5 relative">
-                      <motion.div 
+                      <motion.div
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: step / 7 }}
                         className="absolute inset-0 bg-emerald-500 origin-left"

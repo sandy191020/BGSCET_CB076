@@ -142,7 +142,7 @@ export async function* runVerification(
   yield {
     step: 'Final Verdict',
     message: verdictMessage,
-    data: { approved, creditAmount, fraudRisk: riskAssessment.risk },
+    data: { approved, creditAmount, fraudRisk: riskAssessment.risk, ndviScore },
   };
 
   // Note: recordSubmission has been moved to the actual minting route to 

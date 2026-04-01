@@ -3,6 +3,11 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "./Navbar";
 import { AuctionBanner } from "./AuctionBanner";
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { config } from '@/lib/blockchain/config';
+
+const queryClient = new QueryClient();
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -12,17 +17,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     pathname?.startsWith("/admin") || 
                     pathname?.startsWith("/marketplace") || 
                     pathname?.startsWith("/verify") || 
+                    pathname?.startsWith("/track") || 
                     pathname?.startsWith("/auction/");
 
   return (
-    <>
-      {!isAppPage && (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
         <>
-          <Navbar />
-          <AuctionBanner />
+          {!isAppPage && (
+            <>
+              <Navbar />
+              <AuctionBanner />
+            </>
+          )}
+          <main className={!isAppPage ? "pt-16" : ""}>{children}</main>
         </>
-      )}
-      <main className={!isAppPage ? "pt-16" : ""}>{children}</main>
-    </>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
