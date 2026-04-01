@@ -15,6 +15,7 @@ const customIcon = new L.Icon({
 interface LeafletMapProps {
   onCoordsSelect?: (lng: number, lat: number) => void;
   searchPoint?: [number, number] | null;
+  isSatellite?: boolean;
 }
 
 function MapController({ searchPoint }: { searchPoint?: [number, number] | null }) {
@@ -71,7 +72,7 @@ function LocationMarker({
   );
 }
 
-export default function LeafletMap({ onCoordsSelect, searchPoint }: LeafletMapProps) {
+export default function LeafletMap({ onCoordsSelect, searchPoint, isSatellite }: LeafletMapProps) {
   return (
     <MapContainer 
       center={[12.9716, 77.5946]} 
@@ -84,11 +85,12 @@ export default function LeafletMap({ onCoordsSelect, searchPoint }: LeafletMapPr
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      <TileLayer
-        attribution='&copy; ESRI'
-        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        opacity={0.3}
-      />
+      {isSatellite && (
+        <TileLayer
+          attribution='&copy; ESRI Satellite'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+        />
+      )}
 
       <MapController searchPoint={searchPoint} />
       <LocationMarker onCoordsSelect={onCoordsSelect} initialPosition={searchPoint} />
