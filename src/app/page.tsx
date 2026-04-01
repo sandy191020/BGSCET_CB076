@@ -1,10 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe } from "lucide-react";
+import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { CinematicDemo } from "@/components/CinematicDemo";
 
 export default function Home() {
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -20,6 +23,7 @@ export default function Home() {
 
   return (
     <div className="neural-grid min-h-screen pt-16">
+      <CinematicDemo isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       {/* Hero Section */}
       <section className="relative overflow-hidden px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
@@ -65,9 +69,13 @@ export default function Home() {
               Start Earning
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link href="#how-it-works" className="text-sm font-semibold leading-6 text-white hover:text-emerald-400">
-              Watch Demo <span aria-hidden="true">→</span>
-            </Link>
+            <button 
+              onClick={() => setIsDemoOpen(true)}
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20"
+            >
+              <Play className="h-5 w-5 fill-emerald-500 text-emerald-500" />
+              Watch Demo
+            </button>
           </motion.div>
         </div>
       </section>
