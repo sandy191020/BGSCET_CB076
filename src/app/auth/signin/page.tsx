@@ -27,8 +27,8 @@ export default function SignIn() {
 
       if (error) throw error;
 
-      router.push("/dashboard");
       router.refresh();
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
     } finally {
