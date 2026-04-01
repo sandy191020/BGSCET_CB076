@@ -1,0 +1,23 @@
+# GreenLedger Project Tasks
+
+ - [x] Project Initialization
+    - [x] Create Next.js app with `pnpm` [x]
+    - [x] Configure Tailwind CSS design system (Obsidian/Neural theme) [x]
+    - [x] Set up Supabase project and schema [x]
+- [ ] Core Features Implementation
+    - [x] Farmer Dashboard & GPS Submission [x]
+    - [x] Leaflet + OSM Integration with Markers, Search, Geolocation & Boundary Drawing [x]
+    - [x] Mastra AI Agent for NDVI Scoring [x]
+    - [x] IPFS Storage (Pinata) for Image Hashes [x]
+- [x] Blockchain & Smart Contracts
+    - [x] ERC-1155 Contract on Polygon (Testnet) [x]
+    - [x] Token Minting Logic (Wallet-to-Wallet) [x]
+- [x] User Authentication
+    - [x] Supabase Auth (SignIn/SignUp) Integration [x]
+    - [x] Route Protection (Middleware) [x]
+- [x] Marketplace & Demo
+    - [x] Secondary Marketplace UI [x]
+    - [x] Cinematic "Watch Demo" Animation (Growth -> Token) [x]
+- [x] Polish & Verification
+    - [x] Premium UI/UX Animations [x]
+    - [x] End-to-End Testing of the Demo Flow [x]
