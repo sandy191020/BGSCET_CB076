@@ -3,12 +3,25 @@
 import { motion } from "framer-motion";
 import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CinematicDemo } from "@/components/CinematicDemo";
 import { AuctionBanner } from "@/components/AuctionBanner";
+import { supabase } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 export default function Home() {
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -82,85 +95,89 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="how-it-works" className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          <FeatureCard 
-            icon={<Satellite className="h-8 w-8 text-emerald-500" />}
-            title="Satellite Proof"
-            description="High-resolution Sentinel-2 imagery proves your sustainable practices from space."
-          />
-          <FeatureCard 
-            icon={<BrainCircuit className="h-8 w-8 text-emerald-500" />}
-            title="Mastra AI Analysis"
-            description="Autonomous agents calculate NDVI scores and detect fraud live on-screen."
-          />
-          <FeatureCard 
-            icon={<Target className="h-8 w-8 text-emerald-500" />}
-            title="Instant Minting"
-            description="ERC-1155 tokens are minted directly to your wallet the moment you qualify."
-          />
-          <FeatureCard 
-            icon={<Globe className="h-8 w-8 text-emerald-500" />}
-            title="Direct Trade"
-            description="Swap credits on our secondary marketplace with zero middlemen and zero delays."
-          />
-        </motion.div>
-      </section>
+      {user && (
+        <>
+          {/* Features Grid */}
+          <section id="how-it-works" className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <FeatureCard 
+                icon={<Satellite className="h-8 w-8 text-emerald-500" />}
+                title="Satellite Proof"
+                description="High-resolution Sentinel-2 imagery proves your sustainable practices from space."
+              />
+              <FeatureCard 
+                icon={<BrainCircuit className="h-8 w-8 text-emerald-500" />}
+                title="Mastra AI Analysis"
+                description="Autonomous agents calculate NDVI scores and detect fraud live on-screen."
+              />
+              <FeatureCard 
+                icon={<Target className="h-8 w-8 text-emerald-500" />}
+                title="Instant Minting"
+                description="ERC-1155 tokens are minted directly to your wallet the moment you qualify."
+              />
+              <FeatureCard 
+                icon={<Globe className="h-8 w-8 text-emerald-500" />}
+                title="Direct Trade"
+                description="Swap credits on our secondary marketplace with zero middlemen and zero delays."
+              />
+            </motion.div>
+          </section>
 
-      {/* Problem/Solution Section */}
-      <section id="problem" className="bg-zinc-950/50 py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">The Ecosystem of Fraud ends here.</h2>
-              <p className="mt-6 text-lg leading-8 text-zinc-400">
-                Today, carbon brokers take up to 70% of the value. Farmers do the work, while middlemen reap the rewards. 
-                GreenLedger creates a direct, trustless pipeline from land to liquidity.
-              </p>
-              <ul className="mt-10 space-y-4">
-                <li className="flex items-start gap-3">
-                  <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
-                    <Lock className="h-4 w-4" />
-                  </div>
-                  <span className="text-zinc-300 font-medium">Tamper-proof satellite evidence anchored on-chain.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
-                    <Zap className="h-4 w-4" />
-                  </div>
-                  <span className="text-zinc-300 font-medium">Instant payouts via automated smart contracts.</span>
-                </li>
-              </ul>
-            </div>
-            <div className="glass relative rounded-3xl p-8 overflow-hidden min-h-[300px] flex flex-col justify-center border-emerald-500/10">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Leaf className="h-32 w-32" />
-              </div>
-              <div className="relative z-10">
-                <p className="text-emerald-500 font-mono text-sm mb-4">SYSTEM_STATUS: SECURE_LEDGER</p>
-                <div className="space-y-6">
-                  <div className="h-2 w-3/4 rounded bg-emerald-500/20" />
-                  <div className="h-2 w-1/2 rounded bg-emerald-500/20" />
-                  <div className="h-2 w-5/6 rounded bg-emerald-500/20" />
-                  <div className="h-2 w-2/3 rounded bg-emerald-500/20" />
+          {/* Problem/Solution Section */}
+          <section id="problem" className="bg-zinc-950/50 py-24 sm:py-32">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+              <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
+                <div>
+                  <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">The Ecosystem of Fraud ends here.</h2>
+                  <p className="mt-6 text-lg leading-8 text-zinc-400">
+                    Today, carbon brokers take up to 70% of the value. Farmers do the work, while middlemen reap the rewards. 
+                    GreenLedger creates a direct, trustless pipeline from land to liquidity.
+                  </p>
+                  <ul className="mt-10 space-y-4">
+                    <li className="flex items-start gap-3">
+                      <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+                        <Lock className="h-4 w-4" />
+                      </div>
+                      <span className="text-zinc-300 font-medium">Tamper-proof satellite evidence anchored on-chain.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+                        <Zap className="h-4 w-4" />
+                      </div>
+                      <span className="text-zinc-300 font-medium">Instant payouts via automated smart contracts.</span>
+                    </li>
+                  </ul>
                 </div>
-                <div className="mt-12 flex items-center justify-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/20 ring-1 ring-emerald-500/50">
-                    <BrainCircuit className="h-8 w-8 text-emerald-500 animate-pulse" />
+                <div className="glass relative rounded-3xl p-8 overflow-hidden min-h-[300px] flex flex-col justify-center border-emerald-500/10">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Leaf className="h-32 w-32" />
+                  </div>
+                  <div className="relative z-10">
+                    <p className="text-emerald-500 font-mono text-sm mb-4">SYSTEM_STATUS: SECURE_LEDGER</p>
+                    <div className="space-y-6">
+                      <div className="h-2 w-3/4 rounded bg-emerald-500/20" />
+                      <div className="h-2 w-1/2 rounded bg-emerald-500/20" />
+                      <div className="h-2 w-5/6 rounded bg-emerald-500/20" />
+                      <div className="h-2 w-2/3 rounded bg-emerald-500/20" />
+                    </div>
+                    <div className="mt-12 flex items-center justify-center">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/20 ring-1 ring-emerald-500/50">
+                        <BrainCircuit className="h-8 w-8 text-emerald-500 animate-pulse" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        </>
+      )}
     </div>
   );
 }
