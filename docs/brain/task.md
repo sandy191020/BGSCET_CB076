@@ -12,9 +12,12 @@
 - [x] Blockchain & Smart Contracts
     - [x] ERC-1155 Contract on Polygon (Testnet) [x]
     - [x] Token Minting Logic (Wallet-to-Wallet) [x]
+- [x] User Authentication
+    - [x] Supabase Auth (SignIn/SignUp) Integration [x]
+    - [x] Route Protection (Middleware) [x]
 - [x] Marketplace & Demo
     - [x] Secondary Marketplace UI [x]
-    - [x] 60-Second Demo Flow Animation [x]
+    - [x] Cinematic "Watch Demo" Animation (Growth -> Token) [x]
 - [x] Polish & Verification
     - [x] Premium UI/UX Animations [x]
     - [x] End-to-End Testing of the Demo Flow [x]

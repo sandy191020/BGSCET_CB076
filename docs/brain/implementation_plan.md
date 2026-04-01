@@ -16,9 +16,10 @@ GreenLedger is a blockchain-powered platform that incentivizes sustainable farmi
 - [NEW] Configure `tailwind.config.ts` for "Neural Obsidian" theme (Glassmorphism, Emerald accents).
 
 ### [Frontend - Dashboard & Map]
-- [MODIFY] `src/components/map/MapContainer.tsx`: Migrate from Mapbox to Leaflet + OSM.
-- [NEW] Add `react-leaflet` for marker management and farm boundary drawing.
-- [NEW] Support optional Satellite tile layer (Esri/Sentinel-2 metadata).
+- [MODIFY] `src/components/map/MapContainer.tsx`: Leaflet + OSM integration.
+- [NEW] `src/components/CinematicDemo.tsx`: High-end, Apple-level product animation for the "Watch Demo" button.
+- [NEW] `src/components/GrowthAnimation.tsx`: SVG-based organic plant growth and tokenization animation.
+- [NEW] Add `framer-motion` sequences for synced feature reveals.
 
 ### [AI Agent - Mastra]
 - [NEW] `src/lib/mastra/agent.ts`: Configuration for the Mastra agent to process NDVI data.
