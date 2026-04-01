@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Calendar, Zap, Users, BarChart3, Clock, Tag } from "lucide-react";
+import { Plus, Calendar, Zap, Users, BarChart3, Clock, Tag, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -48,6 +48,19 @@ export default function AdminDashboard() {
       }));
       
       setAuctions(auctionsWithSeats);
+    }
+    setLoading(false);
+  };
+
+  const handleDeleteAuction = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this auction? All related bids and seats will be PERMANENTLY removed.")) return;
+    
+    setLoading(true);
+    const { error } = await supabase.from("auctions").delete().eq("id", id);
+    if (error) {
+      setError(`Delete Failed: ${error.message}`);
+    } else {
+      fetchAuctions();
     }
     setLoading(false);
   };
@@ -281,6 +294,12 @@ export default function AdminDashboard() {
                       STOP AUCTION
                     </button>
                   )}
+                  <button 
+                    onClick={() => handleDeleteAuction(auction.id)}
+                    className="p-2.5 rounded-xl border border-red-500/10 text-red-500/50 hover:text-red-500 hover:bg-red-500/5 transition-colors"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                   <button className="p-2.5 rounded-xl border border-white/5 text-zinc-500 hover:text-white hover:bg-white/5 transition-colors">
                     <BarChart3 className="h-5 w-5" />
                   </button>
