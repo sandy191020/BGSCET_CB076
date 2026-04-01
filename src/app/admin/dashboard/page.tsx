@@ -31,12 +31,24 @@ export default function AdminDashboard() {
 
   const fetchAuctions = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data: auctionsData } = await supabase
       .from("auctions")
       .select("*")
       .order("scheduled_at", { ascending: true });
     
-    if (!error) setAuctions(data || []);
+    if (auctionsData) {
+      // Fetch seat counts for each auction
+      const { data: seatsData } = await supabase
+        .from("auction_seats")
+        .select("auction_id");
+        
+      const auctionsWithSeats = auctionsData.map(a => ({
+        ...a,
+        seat_count: seatsData?.filter(s => s.auction_id === a.id).length || 0
+      }));
+      
+      setAuctions(auctionsWithSeats);
+    }
     setLoading(false);
   };
 
@@ -236,6 +248,10 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="flex items-center gap-8 px-8 border-x border-white/5">
+                  <div className="text-center">
+                    <p className="text-[10px] font-mono text-zinc-500 uppercase mb-1 text-zinc-400">Seats Booked</p>
+                    <p className="text-lg font-bold text-emerald-500">{auction.seat_count || 0}</p>
+                  </div>
                   <div className="text-center">
                     <p className="text-[10px] font-mono text-zinc-500 uppercase mb-1">Min Price</p>
                     <p className="text-lg font-bold">₹{auction.min_price}</p>
