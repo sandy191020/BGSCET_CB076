@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Real blockchain minting
-    const { mintCredits } = await import('../../../../lib/blockchain');
+    const { mintCarbonCredit } = await import('@/lib/blockchain/mint');
     const { createServerClient } = await import('@supabase/ssr');
     const { cookies } = await import('next/headers');
 
@@ -89,12 +89,10 @@ export async function POST(req: NextRequest) {
       ? farmerId
       : '0x0000000000000000000000000000000000000001';
 
-    const result = await mintCredits(
+    const result = await mintCarbonCredit(
       farmerAddress,
-      farmId,
-      creditAmount,
-      satelliteHash,
-      creditScore
+      agentVerdict.ndviScore,
+      satelliteHash
     );
 
     // PERSIST TO SUPABASE
@@ -135,10 +133,10 @@ export async function POST(req: NextRequest) {
     recordSubmission(farmerId, farmCoordinates);
 
     return NextResponse.json({
-      txHash: result.txHash,
+      txHash: result.transactionHash,
       tokenId: farmId,
       creditAmount,
-      explorerUrl: result.explorerUrl,
+      explorerUrl: `${EXPLORER_URL}/tx/${result.transactionHash}`,
     });
   } catch (error: any) {
     console.error('[mint-token] Error:', error);

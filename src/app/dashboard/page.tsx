@@ -6,10 +6,11 @@ import { AnalysisPanel } from "@/components/dashboard/AnalysisPanel";
 import { motion } from "framer-motion";
 import { 
   Wallet, Satellite, BarChart3, Fingerprint, ShieldAlert, X, Bell, User, Globe, HelpCircle,
-  TrendingUp, Leaf, Zap
+  TrendingUp, Leaf, Zap, ChevronRight
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -167,11 +168,11 @@ export default function Dashboard() {
               </div>
 
               {/* Quick Stats */}
-              <div className="glass rounded-[2rem] border border-white/5 p-8 flex-1 flex flex-col justify-between">
+              <Link href="/wallet" className="glass rounded-[2rem] border border-white/5 p-8 flex-1 flex flex-col justify-between group hover:border-emerald-500/20 transition-all">
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em]">Carbon Inventory (LIVE)</h3>
-                    <Fingerprint className="h-4 w-4 text-emerald-500/50" />
+                    <Fingerprint className="h-4 w-4 text-zinc-600 group-hover:text-emerald-500 transition-colors" />
                   </div>
                   <div className="flex items-end gap-2 mb-4">
                     <span className="text-5xl font-black tracking-tighter text-white">
@@ -197,13 +198,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                 )}
-              </div>
+              </Link>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[500px]">
-             <div className="glass rounded-[2rem] border border-white/5 p-10 flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-10 opacity-10">
+             <Link href="/analytics" className="glass rounded-[2rem] border border-white/5 p-10 flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/20 transition-all">
+                <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 group-hover:scale-110 transition-all">
                   <BarChart3 className="h-40 w-40" />
                 </div>
                 <div>
@@ -222,9 +223,9 @@ export default function Dashboard() {
                     <p className="text-xl font-black text-white">4.2k Tonnes</p>
                   </div>
                 </div>
-             </div>
+             </Link>
 
-             <div className="glass rounded-[2rem] border border-white/5 p-10 flex flex-col justify-between">
+             <Link href="/auction" className="glass rounded-[2rem] border border-white/5 p-10 flex flex-col justify-between group hover:border-emerald-500/20 transition-all">
                 <div>
                   <h2 className="text-3xl font-black uppercase tracking-tighter text-white mb-4">Procurement_Stats</h2>
                   <div className="space-y-4">
@@ -240,22 +241,24 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-                <button className="w-full bg-white text-black py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-all">
-                  Generate PDF Report
+                <button className="w-full bg-white text-black py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-all flex items-center justify-center gap-2">
+                  Navigate to Exchange <ChevronRight className="h-4 w-4" />
                 </button>
-             </div>
+             </Link>
           </div>
         )}
 
         {/* Action Widgets */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {isFarmer && (
-            <StatWidget 
-              icon={<Wallet />} 
-              label="Carbon Wallet" 
-              value={`${profile?.carbon_credits || "0"} GRC`} 
-              trend={`Balance: ${profile?.credits || "0"} Credits`} 
-            />
+            <Link href="/wallet">
+              <StatWidget 
+                icon={<Wallet />} 
+                label="Carbon Wallet" 
+                value={`${profile?.carbon_credits || "0"} GRC`} 
+                trend={`Balance: ${profile?.credits || "0"} Credits`} 
+              />
+            </Link>
           )}
           <StatWidget 
             icon={<Satellite />} 
