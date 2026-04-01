@@ -98,12 +98,38 @@ export async function POST(req: NextRequest) {
     );
 
     // PERSIST TO SUPABASE
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('carbon_credits, full_name')
+      .eq('id', farmerId)
+      .single();
+
     await supabase
       .from('profiles')
       .update({ 
-        carbon_credits: (await supabase.from('profiles').select('carbon_credits').eq('id', farmerId).single()).data?.carbon_credits + creditAmount 
+        carbon_credits: (profile?.carbon_credits || 0) + creditAmount 
       })
       .eq('id', farmerId);
+
+    // CREATE MARKETPLACE LISTING
+    const { error: listingError } = await supabase
+      .from('carbon_listings')
+      .insert({
+        farmer_id: farmerId,
+        token_id: farmId,
+        amount: creditAmount,
+        price_per_credit: 850, // Default price in MATIC or INR
+        status: 'available',
+        farm_id: farmId,
+        farm_name: (body as any).farmName || profile?.full_name || `Farm #${farmId}`,
+        ndvi_score: creditScore / 100,
+        image_hash: satelliteHash,
+        seller_address: farmerAddress
+      });
+
+    if (listingError) {
+      console.error('[mint-token] Listing Error:', listingError);
+    }
 
     // RECORD the submission after the real blockchain transaction
     recordSubmission(farmerId, farmCoordinates);

@@ -84,9 +84,15 @@ export default function Dashboard() {
         .from('carbon_listings')
         .insert([{
           farmer_id: user.id,
+          token_id: Math.floor(Math.random() * 1000), // Mock token ID for now
           amount: carbonCreditsToAdd,
-          price_per_credit: 850, // Default market price
-          status: 'available'
+          price_per_credit: 850,
+          status: 'available',
+          farm_id: 1, // Default or random
+          farm_name: "Greenfield Farm", // Or from profile
+          ndvi_score: finalScore,
+          image_hash: "QmYxivKF7f5xfJBvJqPnWKvqzJ8xKZxZxKZxZxKZxZxK1",
+          seller_address: profile.wallet_address || "0x0000000000000000000000000000000000000000"
         }]);
     }
 
