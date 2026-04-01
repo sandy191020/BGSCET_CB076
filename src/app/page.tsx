@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play, ChevronDown, Box, ShoppingBag, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
-import { CinematicDemo } from "@/components/CinematicDemo";
 import { AuctionBanner } from "@/components/AuctionBanner";
 import { TypewriterTitle } from "@/components/TypewriterTitle";
 import { supabase } from "@/lib/supabase/client";
@@ -12,13 +11,12 @@ import { User } from "@supabase/supabase-js";
 
 export default function LandingPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [isDemoOpen, setIsDemoOpen] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
   });
-  
+
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.7], [0, 1]);
   const contentY = useTransform(scrollYProgress, [0, 0.5], [0, -60]);
@@ -47,7 +45,6 @@ export default function LandingPage() {
     <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30 overflow-x-hidden">
       {/* Dynamic Auction Announcement Banner */}
       <AuctionBanner />
-      <CinematicDemo isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       {/* Hero Section with Video Background */}
       <section ref={heroRef} className="relative overflow-hidden min-h-screen flex items-center justify-center px-6 lg:px-8">
         {/* Video Background (Static, decoupled from motion for raw performance) */}
@@ -65,9 +62,9 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
           {/* Emerald tint overlay */}
           <div className="absolute inset-0 bg-gradient-to-tr from-emerald-950/30 via-transparent to-transparent" />
-          
+
           {/* Parallax Fade Overlay - Fades in black to hide video on scroll */}
-          <motion.div 
+          <motion.div
             style={{ opacity: overlayOpacity }}
             className="absolute inset-0 bg-[#000000] z-10 will-change-opacity"
           />
@@ -76,17 +73,17 @@ export default function LandingPage() {
         <motion.div style={{ y: contentY }} className="relative z-10 mx-auto max-w-4xl text-center">
 
           <TypewriterTitle />
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="mt-8 text-lg leading-8 text-zinc-400"
           >
-            GreenLedger connects sustainable farmers directly to the $2B global carbon credit market. 
+            GreenLedger connects sustainable farmers directly to the $2B global carbon credit market.
             Automated satellite verification. AI-driven scoring. Blockchain-powered liquidity.
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -100,13 +97,13 @@ export default function LandingPage() {
               Start Earning
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <button 
-              onClick={() => setIsDemoOpen(true)}
+            <Link
+              href="/cinematic"
               className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20"
             >
               <Play className="h-5 w-5 fill-emerald-500 text-emerald-500" />
               Watch Demo
-            </button>
+            </Link>
           </motion.div>
         </motion.div>
 
@@ -131,7 +128,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         {/* Background ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 blur-3xl rounded-full pointer-events-none opacity-50 transform-gpu" />
-        
+
         <div className="relative z-10 text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Engineered for Transparency</h2>
           <p className="mt-4 text-zinc-400 max-w-2xl mx-auto text-lg">Our multi-layered verification system ensures every carbon credit is backed by scientific reality.</p>
@@ -144,28 +141,28 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
         >
-          <FeatureCard 
+          <FeatureCard
             icon={<Satellite className="h-7 w-7 text-emerald-400" />}
             title="Satellite Verification"
             description="Sentinel-2 satellite imagery verifies farmland conditions and vegetation health using NDVI analysis."
             accentColor="emerald"
             slideFrom="left"
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<BrainCircuit className="h-7 w-7 text-emerald-400" />}
             title="AI Sustainability Scoring"
             description="Mastra AI analyzes vegetation data and automatically scores farm sustainability."
             accentColor="emerald"
             slideFrom="right"
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<Box className="h-7 w-7 text-emerald-400" />}
             title="Blockchain Tokenization"
             description="Verified carbon reduction is converted into ERC-1155 carbon credit tokens minted on Polygon."
             accentColor="emerald"
             slideFrom="left"
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<ShoppingBag className="h-7 w-7 text-emerald-400" />}
             title="Direct Carbon Marketplace"
             description="Companies purchase carbon credits directly from farmers without intermediaries."
@@ -179,11 +176,11 @@ export default function LandingPage() {
         {/* Cinematic Hero */}
         <section className="relative h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 opacity-40">
-            <CinematicDemo isOpen={true} onClose={() => {}} />
+            {/* Cinematic background removed as per user request */}
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black z-[5]" />
-          
-          <motion.div 
+
+          <motion.div
             style={{ opacity }}
             className="relative z-10 text-center px-6 max-w-5xl mx-auto"
           >
@@ -192,27 +189,8 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em] mb-8 shadow-2xl">
-                <Globe className="h-3 w-3" />
-                The Future of Global Agriculture
-              </div>
-              <h1 className="text-6xl md:text-9xl font-black uppercase tracking-tighter leading-[0.85] mb-8 drop-shadow-2xl">
-                Decentralized <br />
-                <span className="text-emerald-500 italic">Eco-Commerce</span>
-              </h1>
-              <p className="text-zinc-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
-                Connect directly with sustainable farmers through AI-verified carbon indexing and real-time blockchain auctions.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href={user ? "/dashboard" : "/auth/signup"} className="group relative px-10 py-5 bg-white text-black rounded-[2rem] font-black uppercase tracking-widest text-sm flex items-center gap-3 overflow-hidden transition-all hover:pr-12 active:scale-95 shadow-2xl shadow-white/10">
-                  Join the Network
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <button className="px-10 py-5 bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] font-black uppercase tracking-widest text-sm text-zinc-400 hover:text-white hover:border-white/20 transition-all flex items-center gap-3 active:scale-95">
-                  <Play className="h-4 w-4 fill-current" />
-                  Watch Protocol
-                </button>
-              </div>
+
+
             </motion.div>
           </motion.div>
 
@@ -234,7 +212,7 @@ export default function LandingPage() {
                   </div>
                   <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">The Invisible <br /><span className="text-red-500">Market Failure</span></h2>
                   <p className="text-zinc-400 text-lg leading-relaxed font-medium">Traditional supply chains are opaque, inefficient, and penalize sustainable practices. Smallholder farmers lose up to 60% of value to intermediaries while carbon offsets remain unverified.</p>
-                  
+
                   <div className="space-y-4">
                     {[
                       { t: "Opaque Traceability", d: "No way to verify soil health or chemical-free claims." },
@@ -251,13 +229,13 @@ export default function LandingPage() {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="relative aspect-square">
                   <div className="absolute inset-0 bg-red-500/10 blur-[120px] rounded-full animate-pulse" />
                   <div className="relative h-full w-full glass rounded-[4rem] border border-white/10 flex items-center justify-center p-20 transform rotate-3 hover:rotate-0 transition-transform duration-700">
                     <div className="text-center space-y-6">
-                       <AlertCircle className="h-32 w-32 text-red-500 mx-auto opacity-50" />
-                       <div className="font-mono text-zinc-600 text-xs tracking-tighter">ERROR_CODE: MARKET_INEFFICIENCY_DETECTION</div>
+                      <AlertCircle className="h-32 w-32 text-red-500 mx-auto opacity-50" />
+                      <div className="font-mono text-zinc-600 text-xs tracking-tighter">ERROR_CODE: MARKET_INEFFICIENCY_DETECTION</div>
                     </div>
                   </div>
                 </div>
@@ -283,7 +261,7 @@ export default function LandingPage() {
                     <div className="h-16 w-16 bg-white text-black rounded-2xl flex items-center justify-center mb-8 shadow-xl group-hover:bg-emerald-500 transition-colors">
                       {React.cloneElement(step.icon as any, { className: "h-8 w-8" })}
                     </div>
-                    <div className="text-emerald-500 text-xs font-black mb-2 opacity-50 uppercase tracking-[0.3em]">Phase 0{i+1}</div>
+                    <div className="text-emerald-500 text-xs font-black mb-2 opacity-50 uppercase tracking-[0.3em]">Phase 0{i + 1}</div>
                     <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-4">{step.title}</h3>
                     <p className="text-zinc-500 leading-relaxed font-medium">{step.desc}</p>
                   </div>
@@ -302,7 +280,7 @@ export default function LandingPage() {
             </div>
             <span className="text-xl font-black tracking-tighter uppercase italic text-zinc-400">GreenLedger</span>
           </div>
-          
+
           <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-zinc-600">
             <a href="#" className="hover:text-emerald-500 transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-emerald-500 transition-colors">Privacy Protocol</a>
@@ -316,8 +294,7 @@ export default function LandingPage() {
       </footer>
     </div>
   );
-}
-function FeatureCard({ icon, title, description, accentColor, slideFrom = "left" }: { icon: React.ReactNode, title: string, description: string, accentColor: string, slideFrom?: "left" | "right" }) {
+}function FeatureCard({ title, description, accentColor, slideFrom = "left", className = "" }: { title: string, description: string, accentColor: string, slideFrom?: "left" | "right", className?: string }) {
   const xOffset = slideFrom === "left" ? -80 : 80;
   return (
     <motion.div
@@ -327,31 +304,17 @@ function FeatureCard({ icon, title, description, accentColor, slideFrom = "left"
       }}
       whileHover={{ y: -10, scale: 1.03 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-[20px] bg-slate-900/40 p-8 backdrop-blur-xl border border-white/5 transition-all hover:border-emerald-500/30 shadow-2xl"
+      className={`group relative overflow-hidden rounded-[3rem] bg-zinc-900/10 p-12 backdrop-blur-3xl border border-white/5 transition-all hover:border-emerald-500/30 shadow-2xl min-h-[320px] flex flex-col justify-end ${className}`}
     >
-      {/* Glossy gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      {/* Decorative gradients */}
+      <div className="absolute -top-32 -left-32 h-64 w-64 bg-emerald-500/5 blur-[100px] rounded-full group-hover:bg-emerald-500/10 transition-colors" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
       
-      {/* Robot animation embedding onto the feature card */}
-      <div className="absolute -top-4 -right-4 w-32 h-32 opacity-80 pointer-events-none group-hover:opacity-100 transition-opacity z-20">
-         <iframe src='https://my.spline.design/rememberallrobot-zwWQBEBI2pJwOFDFZSqBhrZx/' frameBorder='0' width='100%' height='100%' style={{ pointerEvents: 'none' }}></iframe>
-      </div>
-      
-      {/* Icon frame with micro-animation */}
-      <div className="relative mb-6 inline-flex p-3 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-        <motion.div
-          animate={{ rotate: [0, 5, -5, 0] }}
-          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-        >
-          {icon}
-        </motion.div>
-      </div>
-
-      <h3 className="relative z-10 text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+      <h3 className="relative z-10 text-3xl font-black uppercase tracking-tighter text-white mb-4 group-hover:text-emerald-400 transition-colors font-outfit">
         {title}
       </h3>
       
-      <p className="relative z-10 text-zinc-400 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
+      <p className="relative z-10 text-zinc-400 text-base leading-relaxed group-hover:text-zinc-300 transition-colors max-w-sm">
         {description}
       </p>
 
