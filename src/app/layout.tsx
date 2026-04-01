@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
+import ClientLayout from "@/components/ClientLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,8 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased scroll-smooth">
       <body className={`${inter.className} min-h-full bg-[#050505] text-white selection:bg-emerald-500/30`}>
-        <Navbar />
-        <main>{children}</main>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );

@@ -49,33 +49,17 @@ export default function AuctionRoom({ params }: { params: Promise<{ id: string }
     }
   }, [activeTab]);
 
+  const [presenceCount, setPresenceCount] = useState(1);
+
+  const [connStatus, setConnStatus] = useState<string>("connecting");
+
   useEffect(() => {
-  const initRoom = async () => {
+    const initRoom = async () => {
       setLoading(true);
-      
-      const { data: auctionData } = await supabase
-        .from("auctions")
-        .select("*")
-        .eq("id", auctionId)
-        .single();
-      
+      const { data: auctionData } = await supabase.from("auctions").select("*").eq("id", auctionId).single();
       if (auctionData) {
         setAuction(auctionData);
-        
-        // Fetch existing bids with profiles
-        const { data: bidsData } = await supabase
-          .from("auction_bids")
-          .select(`
-            id,
-            amount,
-            created_at,
-            user_id,
-            profiles:user_id ( full_name, role )
-          `)
-          .eq("auction_id", auctionId)
-          .order("created_at", { ascending: false })
-          .limit(10);
-
+        const { data: bidsData } = await supabase.from("auction_bids").select("id, amount, created_at, user_id, profiles:user_id ( full_name, role )").eq("auction_id", auctionId).order("created_at", { ascending: false }).limit(10);
         if (bidsData && bidsData.length > 0) {
           setCurrentBid(Number(bidsData[0].amount));
           setBidders(bidsData);
@@ -85,36 +69,35 @@ export default function AuctionRoom({ params }: { params: Promise<{ id: string }
       }
       setLoading(false);
     };
-
     initRoom();
     
-    // Subscribe to new bids and manually fetch profile for new entries
-    const channel = supabase
-      .channel(`auction_${auctionId}`)
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'auction_bids',
-        filter: `auction_id=eq.${auctionId}`
-      }, async (payload) => {
-        // Fetch profile for the new bidder
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, role")
-          .eq("id", payload.new.user_id)
-          .single();
-          
-        const bidWithProfile = {
-          ...payload.new,
-          profiles: profile
-        };
-        handleNewBid(bidWithProfile);
-      })
-      .subscribe();
+    const channel = supabase.channel(`auction_room_${auctionId}`, {
+      config: { presence: { key: auctionId } }
+    });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    channel
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'auction_bids', filter: `auction_id=eq.${auctionId}` }, async (payload) => {
+        const { data: profile } = await supabase.from("profiles").select("full_name, role").eq("id", payload.new.user_id).single();
+        handleNewBid({ ...payload.new, profiles: profile });
+      })
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        // Flatten and count unique sessions
+        const allPresences = Object.values(state).flat();
+        setPresenceCount(allPresences.length);
+      })
+      .subscribe(async (status) => {
+        setConnStatus(status);
+        if (status === 'SUBSCRIBED') {
+          const user = (await supabase.auth.getUser()).data.user;
+          await channel.track({
+            user_id: user?.id || `anon_${Math.random().toString(36).substr(2, 9)}`,
+            joined_at: new Date().toISOString(),
+          });
+        }
+      });
+
+    return () => { supabase.removeChannel(channel); };
   }, [auctionId]);
 
   const handleNewBid = (bid: any) => {
@@ -222,11 +205,16 @@ export default function AuctionRoom({ params }: { params: Promise<{ id: string }
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{auction?.title}</h1>
-              <div className="flex gap-4 mt-1 text-xs font-mono text-zinc-500">
+              <div className="flex gap-4 mt-1 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
                 <span className="flex items-center gap-1.5"><Timer className="h-3 w-3" /> LIVE_EXECUTION</span>
                 <span className="flex items-center gap-1.5 text-emerald-500">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
-                  10 PARTICIPANTS CONNECTED
+                  {presenceCount} {presenceCount === 1 ? 'PARTICIPANT' : 'PARTICIPANTS'} IN ROOM
+                </span>
+                <span className={`px-2 py-0.5 rounded-full border ${
+                  connStatus === 'SUBSCRIBED' ? 'border-emerald-500/20 text-emerald-500 bg-emerald-500/5' : 'border-amber-500/20 text-amber-500 bg-amber-500/5'
+                }`}>
+                  {connStatus === 'SUBSCRIBED' ? 'CONNECTED' : connStatus.toUpperCase()}
                 </span>
               </div>
             </div>

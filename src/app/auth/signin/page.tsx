@@ -20,6 +20,14 @@ export default function SignIn() {
     setError(null);
 
     try {
+      // Special Admin Login Check
+      if (email === "admin" && password === "admin123") {
+        // For convenience in this demo, redirect to admin directly
+        // In a real app, this would be a proper Supabase login
+        router.push("/admin");
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -70,12 +78,12 @@ export default function SignIn() {
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-zinc-900/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                placeholder="name@company.com"
+                placeholder="Email or admin"
               />
             </div>
           </div>

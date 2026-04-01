@@ -1,111 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { MapContainer } from "@/components/map/MapContainer";
 import { AnalysisPanel } from "@/components/dashboard/AnalysisPanel";
-import { Wallet, Satellite, BarChart3, Settings, LogOut, LayoutDashboard } from "lucide-react";
-import Link from "next/link";
+import { motion } from "framer-motion";
+import { 
+  Wallet, Satellite, BarChart3, Fingerprint, ShieldAlert, X, Bell, User, Globe, HelpCircle
+} from "lucide-react";
+import { AppShell } from "@/components/AppShell";
 
 export default function Dashboard() {
   const [analyzing, setAnalyzing] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [coords, setCoords] = useState<{ lng: number; lat: number } | null>(null);
-
   const [status, setStatus] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const startAnalysis = async () => {
     if (!coords) return;
-    
     setAnalyzing(true);
     setScore(null);
     setTxHash(null);
     setStatus("INITIALIZING_MASTRA_AGENT...");
-    
-    // 1. AI Analysis
     await new Promise(r => setTimeout(r, 2000));
     setStatus("ANALYZING_SATELLITE_BANDS...");
     await new Promise(r => setTimeout(r, 2000));
     const finalScore = 0.82;
     setScore(finalScore);
-    
-    // 2. IPFS Upload
     setStatus("UPLOADING_PROOF_TO_IPFS...");
     await new Promise(r => setTimeout(r, 1500));
-    const ipfsHash = `ipfs://Qm${Math.random().toString(36).substring(7)}`;
-    
-    // 3. Blockchain Minting
     setStatus("MINTING_ERC1155_ON_POLYGON...");
     await new Promise(r => setTimeout(r, 2500));
     const mockTx = "0x" + Math.random().toString(16).substring(2, 66);
     setTxHash(mockTx);
-    
     setAnalyzing(false);
     setStatus(null);
   };
 
-  const reasoning = "AI confirmed dense, healthy vegetation (NDVI: 0.82) based on NIR and Red band analysis. No industrial pesticide patterns detected. High carbon sequestration potential verified via Sentinel-2 satellite data.";
+  const reasoning = "AI confirmed dense, healthy vegetation (NDVI: 0.82). No industrial pesticide patterns detected. High carbon sequestration potential verified via Sentinel-2 satellite data.";
 
   return (
-    <div className="flex h-screen bg-[#050505] text-white">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 p-6 flex flex-col">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center border border-emerald-500/40">
-            <Satellite className="h-5 w-5" />
-          </div>
-          <span className="font-bold tracking-tight">GreenLedger</span>
-        </div>
-
-        <nav className="flex-1 space-y-1">
-          <NavItem icon={<LayoutDashboard className="h-4 w-4" />} label="Overview" active />
-          <NavItem icon={<Satellite className="h-4 w-4" />} label="Farm Analysis" />
-          <NavItem icon={<Wallet className="h-4 w-4" />} label="Carbon Wallet" />
-          <NavItem icon={<BarChart3 className="h-4 w-4" />} label="Marketplace" />
-        </nav>
-
-        <div className="mt-auto space-y-1">
-          <NavItem icon={<Settings className="h-4 w-4" />} label="Settings" />
-          <NavItem icon={<LogOut className="h-4 w-4 text-red-400" />} label="Logout" />
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto p-8">
-        <div className="mb-8 flex items-center justify-between">
+    <AppShell>
+      <div className="p-8 space-y-8 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Farm Verification</h1>
-            <p className="text-sm text-zinc-400">Satellite-linked carbon credit minting dashboard</p>
+            <h1 className="text-3xl font-black tracking-tighter uppercase mb-1">Farm Verification</h1>
+            <p className="text-sm text-zinc-500 font-mono">NODE_STATUS: <span className="text-emerald-500">ACTIVE_HEALTHY</span> // SATELLITE: SENTINEL-2</p>
           </div>
-          <div className="flex items-center gap-4">
-            {status && (
-              <div className="text-xs font-mono text-emerald-400 animate-pulse uppercase">
-                {status}
+          {status && (
+            <div className="text-[10px] font-mono text-emerald-400 animate-pulse px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 uppercase tracking-widest">
+              {status}
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Map Column */}
+          <div className="lg:col-span-2 rounded-[2rem] overflow-hidden border border-white/5 bg-[#080808] relative min-h-[500px]">
+             <MapContainer 
+              onCoordsSelect={(lng, lat) => {
+                setCoords({ lng, lat });
+                setScore(null);
+              }} 
+            />
+            {!coords && (
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10 pointer-events-none">
+                <div className="bg-zinc-900/80 border border-white/10 rounded-2xl px-6 py-4 text-center">
+                  <p className="text-sm font-bold text-emerald-500 uppercase tracking-widest mb-1">Select Farm Location</p>
+                  <p className="text-xs text-zinc-500">Tap on the satellite map to begin</p>
+                </div>
               </div>
             )}
-            <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-4 py-1.5 text-xs font-medium text-emerald-400">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              SYSTEM_SECURE
-            </div>
-          </div>
-        </div>
-
-        <div className="grid h-[calc(100vh-180px)] grid-cols-3 gap-8">
-          {/* Map Column */}
-          <div className="col-span-2 space-y-6">
-            <div className="h-full">
-              <MapContainer 
-                onCoordsSelect={(lng, lat) => {
-                  setCoords({ lng, lat });
-                  setScore(null);
-                }} 
-              />
-            </div>
           </div>
 
           {/* Analysis Column */}
           <div className="flex flex-col gap-6">
-            <div onClick={startAnalysis} className="cursor-pointer h-full">
+            <div onClick={startAnalysis} className="cursor-pointer">
               <AnalysisPanel 
                 analyzing={analyzing} 
                 score={score} 
@@ -114,33 +84,63 @@ export default function Dashboard() {
             </div>
 
             {/* Quick Stats */}
-            <div className="glass rounded-2xl border border-white/10 p-6 space-y-4">
-              <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Your Credits</h3>
-              <div className="flex items-end justify-between">
-                <span className="text-4xl font-bold text-emerald-500">{score ? (score * 15.5).toFixed(1) : "12.5"}</span>
-                <span className="text-xs text-zinc-500 mb-1">C02_TOKENS</span>
+            <div className="glass rounded-[2rem] border border-white/5 p-8 flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-[0.2em]">Carbon Inventory</h3>
+                  <Fingerprint className="h-4 w-4 text-emerald-500/50" />
+                </div>
+                <div className="flex items-end gap-2 mb-4">
+                  <span className="text-5xl font-black tracking-tighter text-white">
+                    {score ? (score * 15.5).toFixed(1) : "12.5"}
+                  </span>
+                  <span className="text-xs font-mono text-emerald-500 mb-2 uppercase tracking-widest">GL_TOKENS</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-zinc-900 overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "75%" }}
+                    className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400" 
+                  />
+                </div>
               </div>
-              <div className="h-1 w-full rounded-full bg-zinc-800">
-                <div className="h-full w-3/4 rounded-full bg-emerald-500" />
-              </div>
+              
               {txHash && (
-                <div className="mt-4 border-t border-white/5 pt-4">
-                  <p className="text-[10px] font-mono text-zinc-500 truncate">TX: {txHash}</p>
+                <div className="mt-8 pt-8 border-t border-white/5">
+                  <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mb-2">Blockchain Receipt</p>
+                  <div className="bg-black rounded-xl p-3 border border-white/5">
+                    <p className="text-[10px] font-mono text-emerald-500/80 break-all leading-relaxed">{txHash}</p>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Action Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatWidget icon={<Wallet />} label="Carbon Wallet" value="1,240.50 GRC" trend="+12.5% this month" />
+          <StatWidget icon={<Satellite />} label="Verified Land" value="45.2 Hectares" trend="3 active plots" />
+          <StatWidget icon={<BarChart3 />} label="Impact Score" value="0.92 NDVI" trend="Exceeding targets" />
+        </div>
+      </div>
+    </AppShell>
   );
 }
 
-function NavItem({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) {
+function StatWidget({ icon, label, value, trend }: { icon: React.ReactNode, label: string, value: string, trend: string }) {
   return (
-    <Link href="#" className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}>
-      {icon}
-      {label}
-    </Link>
+    <div className="glass p-6 rounded-2xl border-white/5 hover:border-emerald-500/20 transition-all group">
+      <div className="flex items-center justify-between mb-4">
+        <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+          {icon}
+        </div>
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{label}</span>
+      </div>
+      <div className="space-y-1">
+        <p className="text-2xl font-bold text-white">{value}</p>
+        <p className="text-xs text-emerald-500 flex items-center gap-1">{trend}</p>
+      </div>
+    </div>
   );
 }
