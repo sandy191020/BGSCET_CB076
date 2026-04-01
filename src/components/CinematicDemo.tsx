@@ -23,7 +23,7 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
     if (isOpen) {
       const timer = setInterval(() => {
         setStep((s) => (s < 4 ? s + 1 : s));
-      }, 1500);
+      }, 2000);
       return () => clearInterval(timer);
     } else {
       setStep(0);
@@ -133,50 +133,66 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
                     />
 
                     {/* The Plant Growth Animation */}
-                    <div className="relative z-10 mb-12">
+                    <div className="relative z-10 mb-12 flex flex-col items-center justify-center">
                       <AnimatePresence>
-                        {step >= 1 && (
+                        {/* Phase 1: The Seed */}
+                        {step === 1 && (
                           <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 1.5, type: "spring" }}
+                            initial={{ y: -50, opacity: 0, scale: 0.5 }}
+                            animate={{ y: 0, opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.5 }}
+                            transition={{ duration: 0.8, type: "spring" }}
+                            className="h-4 w-3 rounded-full bg-orange-900 shadow-xl shadow-orange-900/50"
+                          />
+                        )}
+
+                        {/* Phase 2+: The Organic Growth */}
+                        {step >= 2 && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             className="relative"
                           >
-                            <svg width="120" height="200" viewBox="0 0 120 200" fill="none">
-                              {/* Stem */}
+                            <svg width="120" height="200" viewBox="0 0 120 200" className="drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                              {/* Spiraling Main Stem */}
                               <motion.path
                                 initial={{ pathLength: 0 }}
                                 animate={{ pathLength: 1 }}
-                                transition={{ duration: 2 }}
-                                d="M60 200V100"
+                                transition={{ duration: 3, ease: "easeInOut" }}
+                                d="M60 200 C60 200 40 170 60 140 C80 110 40 80 60 40"
                                 stroke="#10b981"
-                                strokeWidth="4"
+                                strokeWidth="5"
                                 strokeLinecap="round"
+                                fill="none"
                               />
-                              {/* Leaves */}
-                              <motion.path
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={step >= 2 ? { scale: 1, opacity: 1 } : {}}
-                                d="M60 140C60 140 30 130 20 110C10 90 40 90 60 110"
-                                fill="#10b981"
-                                fillOpacity="0.8"
-                              />
-                              <motion.path
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={step >= 2 ? { scale: 1, opacity: 1 } : {}}
-                                d="M60 120C60 120 90 110 100 90C110 70 80 70 60 90"
-                                fill="#10b981"
-                                fillOpacity="0.8"
-                              />
-                              {/* Flower/Bloom */}
-                              <motion.circle
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={step >= 3 ? { scale: 1, opacity: 1 } : {}}
-                                transition={{ delay: 0.5 }}
-                                cx="60" cy="80" r="15"
-                                fill="#fbbf24"
-                                className="drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]"
-                              />
+
+                              {/* Leaf Groups - Unfurling */}
+                              <LeafGroup delay={1.2} x={60} y={150} scale={0.8} rotation={-45} />
+                              <LeafGroup delay={1.8} x={60} y={110} scale={1} rotation={45} />
+                              <LeafGroup delay={2.4} x={60} y={70} scale={1.2} rotation={-30} />
+                              
+                              {/* Final Bloom */}
+                              {step >= 3 && (
+                                <motion.g
+                                  initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                                  transition={{ duration: 1, delay: 0.5, type: "spring" }}
+                                >
+                                  <circle cx="60" cy="40" r="12" fill="#fbbf24" className="filter blur-[2px]" />
+                                  <motion.circle 
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    cx="60" cy="40" r="18" 
+                                    fill="url(#flowerGlow)" 
+                                  />
+                                  <defs>
+                                    <radialGradient id="flowerGlow">
+                                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.6" />
+                                      <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
+                                    </radialGradient>
+                                  </defs>
+                                </motion.g>
+                              )}
                             </svg>
                           </motion.div>
                         )}
@@ -227,5 +243,32 @@ export function CinematicDemo({ isOpen, onClose }: CinematicDemoProps) {
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function LeafGroup({ delay, x, y, scale, rotation }: { delay: number, x: number, y: number, scale: number, rotation: number }) {
+  return (
+    <motion.g
+      initial={{ scale: 0, opacity: 0, rotate: rotation - 20 }}
+      animate={{ scale, opacity: 1, rotate: rotation }}
+      transition={{ duration: 1.5, delay, type: "spring", bounce: 0.4 }}
+      style={{ originX: `${x}px`, originY: `${y}px` }}
+    >
+      <path
+        d={`M${x} ${y} C${x} ${y} ${x - 30} ${y - 10} ${x - 40} ${y - 30} C${x - 50} ${y - 50} ${x - 20} ${y - 50} ${x} ${y - 30}`}
+        fill="#10b981"
+        fillOpacity="0.9"
+        className="drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"
+      />
+      <motion.path
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1, delay: delay + 0.5 }}
+        d={`M${x} ${y} L${x - 25} ${y - 35}`}
+        stroke="#065f46"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+    </motion.g>
   );
 }
