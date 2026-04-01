@@ -1,8 +1,8 @@
 "use client";
 
-import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play } from "lucide-react";
+import { Leaf, Satellite, BrainCircuit, Shovel, ArrowRight, Zap, Target, Lock, Globe, Play, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AuctionBanner } from "@/components/AuctionBanner";
 import { CinematicDemo } from "@/components/CinematicDemo";
 import { supabase } from "@/lib/supabase/client";
@@ -57,7 +57,7 @@ export default function LandingPage() {
         {/* Cinematic Hero */}
         <section className="relative h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 opacity-40">
-            <CinematicDemo />
+            <CinematicDemo isOpen={true} onClose={() => {}} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black z-[5]" />
           

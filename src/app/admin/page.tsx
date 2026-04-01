@@ -16,9 +16,10 @@ interface Auction {
   id: string;
   title: string;
   type: 'crops' | 'carbon';
-  scheduled_at: string;
   status: 'scheduled' | 'live' | 'completed';
   min_price: number;
+  max_price?: number;
+  highestBid?: any;
 }
 
 export default function AdminDashboard() {
@@ -73,11 +74,23 @@ export default function AdminDashboard() {
   };
 
   const fetchAuctions = async () => {
-    const { data } = await supabase
+    const { data: auctionsData } = await supabase
       .from('auctions')
-      .select('*')
+      .select('*, auction_bids(amount, user_id, profiles(full_name, email))')
       .order('scheduled_at', { ascending: false });
-    if (data) setAuctions(data);
+    
+    if (auctionsData) {
+       const mapped = auctionsData.map((a: any) => {
+           let highestBid = null;
+           if (a.auction_bids && a.auction_bids.length > 0) {
+              const sortedBids = [...a.auction_bids].sort((x, y) => y.amount - x.amount);
+              highestBid = sortedBids[0];
+           }
+           delete a.auction_bids; // Cleanup nested relation
+           return { ...a, highestBid };
+       });
+       setAuctions(mapped);
+    }
     setLoading(false);
   };
 
@@ -515,9 +528,9 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
         )}
       </AnimatePresence>
 
-      <div className="glass rounded-[2.5rem] border border-white/5 bg-zinc-950/20 overflow-hidden">
-         <table className="w-full text-left border-collapse">
-            <thead className="bg-zinc-950/80 border-b border-white/5">
+      <div className="glass rounded-[2.5rem] border border-white/5 bg-zinc-950/20 overflow-x-auto">
+         <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead className="bg-zinc-950/80 border-b border-white/5 whitespace-nowrap">
                <tr>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Signal_UID</th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-500">Exchange_Entity</th>
@@ -545,11 +558,21 @@ function AuctionsTab({ auctions, fetchAuctions }: { auctions: Auction[], fetchAu
                        </div>
                     </td>
                     <td className="px-8 py-6 text-xs font-black text-white italic">₹{a.min_price.toLocaleString()}</td>
-                    <td className="px-8 py-6 text-right">
-                       <div className="flex items-center justify-end gap-2">
-                          {a.status === 'scheduled' && <button onClick={() => updateStatus(a.id, 'live')} className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all"><Play className="h-4 w-4" /></button>}
-                          {a.status === 'live' && <button onClick={() => updateStatus(a.id, 'completed')} className="h-9 w-9 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center hover:bg-blue-500 hover:text-black transition-all font-black text-[9px]">DONE</button>}
-                          <button onClick={() => deleteAuction(a.id)} className="h-9 w-9 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><Trash2 className="h-4 w-4" /></button>
+                    <td className="px-8 py-6 text-right whitespace-nowrap">
+                       <div className="flex items-center justify-end gap-3">
+                          {a.status === 'scheduled' && <button onClick={() => updateStatus(a.id, 'live')} className="h-9 w-9 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all"><Play className="h-4 w-4" /></button>}
+                          {a.status === 'live' && <button onClick={() => updateStatus(a.id, 'completed')} className="h-9 w-9 shrink-0 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center hover:bg-blue-500 hover:text-black transition-all font-black text-[9px]">DONE</button>}
+                          
+                          {a.status === 'completed' && a.highestBid && (
+                              <div className="text-right ml-4 border-r border-white/10 pr-4">
+                                  <p className="text-[10px] font-black uppercase text-emerald-500 tracking-tighter leading-none mb-1">
+                                    WINNER: {a.highestBid.profiles?.full_name || 'Anonymous'}
+                                  </p>
+                                  <p className="text-[8px] font-bold text-zinc-500">{a.highestBid.profiles?.email}</p>
+                              </div>
+                          )}
+
+                          <button onClick={() => deleteAuction(a.id)} className="h-9 w-9 shrink-0 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><Trash2 className="h-4 w-4" /></button>
                        </div>
                     </td>
                  </tr>

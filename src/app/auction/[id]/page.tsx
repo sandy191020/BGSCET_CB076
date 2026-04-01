@@ -26,6 +26,7 @@ interface Bid {
   user_id: string;
   created_at: string;
   user_name?: string;
+  profiles?: any;
 }
 
 export default function LiveAuctionPage() {
@@ -76,6 +77,7 @@ export default function LiveAuctionPage() {
         setAuction(updated);
         if (updated.status === 'completed') {
            setIsConcluded(true);
+           setTimeLeft(0);
         }
       })
       .subscribe();
@@ -137,7 +139,10 @@ export default function LiveAuctionPage() {
 
   const placeBid = async (amount: number) => {
     if (!user || !auction || isConcluded || amount <= (bids[0]?.amount || auction.min_price)) return;
-    if (auction.max_price && amount > auction.max_price) return;
+    
+    // Auto-cap handling: if they bid above max_price, snap to max_price and close
+    const meetsCap = auction.max_price && amount >= auction.max_price;
+    const finalAmount = meetsCap ? auction.max_price : amount;
 
     setIsBidding(true);
     setCustomBid('');
@@ -146,11 +151,16 @@ export default function LiveAuctionPage() {
       .insert([{
         auction_id: id,
         user_id: user.id,
-        amount: amount
+        amount: finalAmount
       }]);
 
     if (!error) {
-       setTimeLeft(30);
+       if (meetsCap) {
+         handleAuctionEnd();
+         setTimeLeft(0);
+       } else {
+         setTimeLeft(30);
+       }
     }
     setIsBidding(false);
   };
@@ -232,8 +242,8 @@ export default function LiveAuctionPage() {
            </div>
 
            {/* Center Stage: Timer & Bidding */}
-           <div className="col-span-1 lg:col-span-2 flex flex-col overflow-hidden relative">
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative">
+           <div className="col-span-1 lg:col-span-2 flex flex-col relative order-first lg:order-none">
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative py-12 lg:py-8">
                  
                  {/* 30s Timer */}
                  {!isConcluded && auction.status === 'live' && (
@@ -249,9 +259,18 @@ export default function LiveAuctionPage() {
                        <span className="text-3xl font-black tracking-tighter">00:{timeLeft.toString().padStart(2, '0')}</span>
                     </motion.div>
                  )}
-                 {isConcluded && (
+                 {isConcluded && bids.length > 0 && (
+                    <div className="mb-6 flex flex-col items-center">
+                       <div className="px-6 py-2 rounded-full border border-blue-500/50 bg-black/50 text-blue-500 text-xl font-black tracking-widest uppercase mb-4">
+                          CLOSED
+                       </div>
+                       <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Winning Node</p>
+                       <p className="text-2xl font-black text-white">{bids[0]?.profiles?.full_name || 'Anonymous'}</p>
+                    </div>
+                 )}
+                 {isConcluded && bids.length === 0 && (
                     <div className="mb-6 px-6 py-2 rounded-full border border-blue-500/50 bg-black/50 text-blue-500 text-xl font-black tracking-widest uppercase">
-                       CLOSED
+                       CLOSED (NO BIDS)
                     </div>
                  )}
 
@@ -365,9 +384,9 @@ export default function LiveAuctionPage() {
                           </div>
                           <p className={`text-xl font-black ${i === 0 ? 'text-emerald-400' : 'text-white'}`}>₹{bid.amount.toLocaleString()}</p>
                           {i === 0 && !isConcluded && (
-                             <div className="mt-2 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
-                                Processing Validator...
-                             </div>
+                             <p className="text-[9px] font-black text-white uppercase tracking-tighter truncate w-16 text-right">
+                                {bid?.profiles?.full_name?.split(' ')[0] || 'Unknown'}
+                             </p>
                           )}
                        </motion.div>
                     ))}

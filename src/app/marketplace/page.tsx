@@ -37,6 +37,7 @@ export default function MarketplacePage() {
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [totalParticipants, setTotalParticipants] = useState<number>(0);
 
   useEffect(() => {
     fetchAuctions();
@@ -60,6 +61,11 @@ export default function MarketplacePage() {
        });
        setAuctions(sorted);
     }
+    
+    // Fetch real member count
+    const { count } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+    setTotalParticipants(count || 0);
+
     setLoading(false);
   };
 
@@ -138,7 +144,7 @@ export default function MarketplacePage() {
             </div>
             <div className="glass p-6 rounded-3xl border border-white/5 bg-zinc-950/20 text-center">
               <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Participants</p>
-              <p className="text-2xl font-black text-emerald-500">1.2K</p>
+              <p className="text-2xl font-black text-emerald-500">{totalParticipants}</p>
             </div>
           </div>
         </section>
