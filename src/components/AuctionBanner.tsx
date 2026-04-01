@@ -20,9 +20,12 @@ export function AuctionBanner() {
         .order("scheduled_at", { ascending: true })
         .limit(1)
         .single();
-      if (error) console.error("Banner Supabase Error:", error);
-      if (data) console.log("Banner Auction Data:", data);
-      if (!error && data) setAuction(data);
+      // Log errors only if they aren't 'no rows found' (PGRST116)
+      if (error && error.code !== 'PGRST116') {
+        console.error("Banner Supabase Error:", error);
+      }
+      
+      if (data) setAuction(data);
       setLoading(false);
     }
     fetchScheduled();
