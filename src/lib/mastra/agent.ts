@@ -2,6 +2,7 @@ import { Mastra } from "@mastra/core";
 import { Agent } from "@mastra/core/agent";
 
 export const ndviAgent = new Agent({
+  id: "ndvi-analysis-agent",
   name: "NDVI Analysis Agent",
   instructions: `
     You are an AI agent specialized in analyzing satellite imagery for sustainable farming.
@@ -11,7 +12,7 @@ export const ndviAgent = new Agent({
     Always provide a detailed reasoning for your score.
   `,
   model: {
-    id: "openai/gpt-4o",
+    id: "openai/gpt-4o" as `${string}/${string}`,
   },
 });
 
