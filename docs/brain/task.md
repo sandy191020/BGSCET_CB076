@@ -17,7 +17,7 @@
     - [x] Route Protection (Middleware) [x]
 - [x] Marketplace & Demo
     - [x] Secondary Marketplace UI [x]
-    - [x] Cinematic "Watch Demo" Animation (Growth -> Token) [x]
+    - [x] Hyper-Realistic Cinematic Ad (Scene 1-7) [x]
 - [x] Polish & Verification
     - [x] Premium UI/UX Animations [x]
     - [x] End-to-End Testing of the Demo Flow [x]

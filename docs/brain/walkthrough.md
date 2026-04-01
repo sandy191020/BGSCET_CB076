@@ -31,7 +31,17 @@ Users can now search for their land by typing an address or landmark. The map au
 ### 4. Pinpoint Geolocation
 A dedicated "Locate Me" button allows farmers to jump directly to their current physical coordinates with high precision, ensuring the boundary is drawn exactly where they stand.
 
-### 5. Automated Minting Chain
+### 5. Hyper-Realistic Cinematic Ad
+An ultra-premium, 7-scene product advertisement using hyper-realistic 8K 3D assets:
+1. **Dark Hook**: Macro shot of moist soil inside a 3D smartphone.
+2. **Seed Drop**: Detailed seed falling with cinematic slow-mo and dust particles.
+3. **Fluid Water**: High-speed photography of water pouring and interacting with soil.
+4. **Natural Growth**: Biological morphing from sprout to full-grown plant with visible leaf veins.
+5. **Sun Bloom**: Warm golden light rays and lens flares as the plant reaches full health.
+6. **Token Reveal**: Metallic, rotating digital carbon coin with holographic blockchain patterns.
+7. **RBI-Style Cards**: Premium financial feature cards with glassmorphism, depth, and currency-style identifiers.
+
+### 6. Automated Minting Chain
 When a farm scores high (>0.6), the system automatically:
 1. Generates a satellite proof image.
 2. Uploads the hash to IPFS.

@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { Search, Loader2, Navigation } from "lucide-react";
+import { Search, Loader2, Navigation, Layers } from "lucide-react";
 
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
@@ -21,6 +21,7 @@ export function MapContainer({ onCoordsSelect }: MapContainerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchPoint, setSearchPoint] = useState<[number, number] | null>(null);
+  const [isSatellite, setIsSatellite] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,12 +98,22 @@ export function MapContainer({ onCoordsSelect }: MapContainerProps) {
         >
           <Navigation className="h-4 w-4 fill-emerald-500/20" />
         </button>
+        {/* Satellite Toggle */}
+        <button
+          onClick={() => setIsSatellite(!isSatellite)}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 backdrop-blur-xl transition-all ${
+            isSatellite ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400" : "bg-black/60 text-zinc-400 hover:text-white"
+          }`}
+          title="Toggle Satellite View"
+        >
+          <Layers className="h-4 w-4" />
+        </button>
       </div>
 
-      <LeafletMap onCoordsSelect={onCoordsSelect} searchPoint={searchPoint} />
+      <LeafletMap onCoordsSelect={onCoordsSelect} searchPoint={searchPoint} isSatellite={isSatellite} />
       
       <div className="pointer-events-none absolute bottom-4 left-4 z-10 rounded-lg bg-black/60 px-3 py-1.5 text-xs font-mono text-emerald-500 backdrop-blur-md">
-        ENGINE: LEAFLET_GEO_LOCATOR
+        ENGINE: LEAFLET_AI_SEARCH
       </div>
     </div>
   );
