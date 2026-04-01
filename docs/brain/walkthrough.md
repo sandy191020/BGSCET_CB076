@@ -31,7 +31,16 @@ Users can now search for their land by typing an address or landmark. The map au
 ### 4. Pinpoint Geolocation
 A dedicated "Locate Me" button allows farmers to jump directly to their current physical coordinates with high precision, ensuring the boundary is drawn exactly where they stand.
 
-### 5. Automated Minting Chain
+### 5. Ultra-Premium Cinematic Ad
+A high-end, 6-scene product advertisement experience:
+1. **Dark Hook**: Soil inside a smartphone.
+2. **Seed Drop**: Slow-mo planting effect.
+3. **Fluid Water**: Artistic water stream animation.
+4. **Sunrise Growth**: Organic spiraling plant growth synced with sunlight.
+5. **Full Bloom**: Vibrant plant with digital tokenization.
+6. **RBI-Style Reveal**: Feature cards appear like premium financial "notes" with depth and motion blur.
+
+### 6. Automated Minting Chain
 When a farm scores high (>0.6), the system automatically:
 1. Generates a satellite proof image.
 2. Uploads the hash to IPFS.

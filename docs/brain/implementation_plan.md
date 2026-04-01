@@ -15,11 +15,13 @@ GreenLedger is a blockchain-powered platform that incentivizes sustainable farmi
 - [NEW] Initialize Next.js project using `pnpm` with Tailwind CSS.
 - [NEW] Configure `tailwind.config.ts` for "Neural Obsidian" theme (Glassmorphism, Emerald accents).
 
-### [Frontend - Dashboard & Map]
-- [MODIFY] `src/components/map/MapContainer.tsx`: Leaflet + OSM integration.
-- [NEW] `src/components/CinematicDemo.tsx`: High-end, Apple-level product animation for the "Watch Demo" button.
-- [NEW] `src/components/GrowthAnimation.tsx`: SVG-based organic plant growth and tokenization animation.
-- [NEW] Add `framer-motion` sequences for synced feature reveals.
+### [Frontend - Cinematic Ad-Style Demo]
+- [NEW] `src/components/AdStyleDemo.tsx`: Ultra-premium, six-scene cinematic advertisement flow.
+- [NEW] **Scene 1-2**: Dark hook + Seed planting (gravity-based spring physics).
+- [NEW] **Scene 3**: Water flow animation (SVG path tracing with fluid easing).
+- [NEW] **Scene 4-5**: Sunrise transition + Spiraling growth + Tokenization.
+- [NEW] **Scene 6**: "RBI-Note" style feature cards on the left (depth, blur, and currency-issue animation).
+- [NEW] **Audio Integration**: (Optional) Ambient wind/water/glow sound system.
 
 ### [AI Agent - Mastra]
 - [NEW] `src/lib/mastra/agent.ts`: Configuration for the Mastra agent to process NDVI data.
