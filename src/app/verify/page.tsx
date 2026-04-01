@@ -240,11 +240,14 @@ export default function VerifyPage() {
             </div>
 
             {/* Verify button */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleVerify}
               disabled={!selectedFarm || step === "verifying" || step === "minting"}
-              className="flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-emerald-900/40 transition-all hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="relative flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white shadow-xl shadow-emerald-900/40 transition-all hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden group"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               {step === "verifying" ? (
                 <>
                   <motion.div
@@ -256,12 +259,12 @@ export default function VerifyPage() {
                 </>
               ) : (
                 <>
-                  <Satellite className="h-5 w-5" />
+                  <Satellite className="h-6 w-6" />
                   Verify Farm
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
 
           {/* Right: Agent Reasoning Panel */}

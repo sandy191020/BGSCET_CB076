@@ -42,6 +42,7 @@ export function Navbar() {
           <Link href="/#how-it-works" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">How it Works</Link>
           <Link href="/verify" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">Verify Farm</Link>
           <Link href="/marketplace" className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-500">Marketplace</Link>
+          <Link href="/admin" className="text-sm font-mono text-emerald-500/50 hover:text-emerald-400 transition-colors px-2 py-1 rounded border border-emerald-500/10 bg-emerald-500/5 uppercase tracking-widest text-[10px]">Admin_Portal</Link>
           
           {user ? (
             <div className="flex items-center gap-4">
