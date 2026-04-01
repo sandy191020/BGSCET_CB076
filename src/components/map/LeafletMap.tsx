@@ -1,9 +1,7 @@
-"use client";
-
-import { MapContainer, TileLayer, Marker, Rectangle, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Rectangle, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Fix for default marker icon issue in Leaflet + Next.js
 const customIcon = new L.Icon({
@@ -16,11 +14,40 @@ const customIcon = new L.Icon({
 
 interface LeafletMapProps {
   onCoordsSelect?: (lng: number, lat: number) => void;
+  searchPoint?: [number, number] | null;
 }
 
-function LocationMarker({ onCoordsSelect }: { onCoordsSelect?: (lng: number, lat: number) => void }) {
-  const [position, setPosition] = useState<L.LatLng | null>(null);
+function MapController({ searchPoint }: { searchPoint?: [number, number] | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (searchPoint) {
+      map.flyTo(searchPoint, 16);
+    }
+  }, [searchPoint, map]);
+  return null;
+}
+
+function LocationMarker({ 
+  onCoordsSelect, 
+  initialPosition 
+}: { 
+  onCoordsSelect?: (lng: number, lat: number) => void;
+  initialPosition?: [number, number] | null;
+}) {
+  const [position, setPosition] = useState<L.LatLng | null>(
+    initialPosition ? L.latLng(initialPosition[0], initialPosition[1]) : null
+  );
   
+  useEffect(() => {
+    if (initialPosition) {
+      const newPos = L.latLng(initialPosition[0], initialPosition[1]);
+      setPosition(newPos);
+      if (onCoordsSelect) {
+        onCoordsSelect(newPos.lng, newPos.lat);
+      }
+    }
+  }, [initialPosition]);
+
   useMapEvents({
     click(e) {
       setPosition(e.latlng);
@@ -35,16 +62,16 @@ function LocationMarker({ onCoordsSelect }: { onCoordsSelect?: (lng: number, lat
       <Marker position={position} icon={customIcon} />
       <Rectangle 
         bounds={[
-          [position.lat - 0.005, position.lng - 0.005],
-          [position.lat + 0.005, position.lng + 0.005]
+          [position.lat - 0.002, position.lng - 0.002],
+          [position.lat + 0.002, position.lng + 0.002]
         ]} 
-        pathOptions={{ color: '#10b981', weight: 2, fillOpacity: 0.1 }}
+        pathOptions={{ color: '#10b981', weight: 2, fillOpacity: 0.15, dashArray: '5, 5' }}
       />
     </>
   );
 }
 
-export default function LeafletMap({ onCoordsSelect }: LeafletMapProps) {
+export default function LeafletMap({ onCoordsSelect, searchPoint }: LeafletMapProps) {
   return (
     <MapContainer 
       center={[12.9716, 77.5946]} 
@@ -57,14 +84,14 @@ export default function LeafletMap({ onCoordsSelect }: LeafletMapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      {/* Optional Satellite Layer */}
       <TileLayer
         attribution='&copy; ESRI'
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        opacity={0.5}
+        opacity={0.3}
       />
 
-      <LocationMarker onCoordsSelect={onCoordsSelect} />
+      <MapController searchPoint={searchPoint} />
+      <LocationMarker onCoordsSelect={onCoordsSelect} initialPosition={searchPoint} />
     </MapContainer>
   );
 }
