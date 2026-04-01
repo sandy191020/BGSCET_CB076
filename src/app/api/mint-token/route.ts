@@ -62,6 +62,24 @@ export async function POST(req: NextRequest) {
 
     // Real blockchain minting
     const { mintCredits } = await import('../../../../lib/blockchain');
+    const { createServerClient } = await import('@supabase/ssr');
+    const { cookies } = await import('next/headers');
+
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+          },
+        },
+      }
+    );
 
     // Credit score: convert ndviScore (0-1) to (0-100)
     const creditScore = Math.round(agentVerdict.ndviScore * 100);
@@ -78,6 +96,14 @@ export async function POST(req: NextRequest) {
       satelliteHash,
       creditScore
     );
+
+    // PERSIST TO SUPABASE
+    await supabase
+      .from('profiles')
+      .update({ 
+        carbon_credits: (await supabase.from('profiles').select('carbon_credits').eq('id', farmerId).single()).data?.carbon_credits + creditAmount 
+      })
+      .eq('id', farmerId);
 
     // RECORD the submission after the real blockchain transaction
     recordSubmission(farmerId, farmCoordinates);

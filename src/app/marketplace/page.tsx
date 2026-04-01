@@ -149,12 +149,20 @@ export default function MarketplacePage() {
           </div>
         </section>
 
-        {/* Categories Tab (Demo) */}
+        {/* Categories Tab */}
         <div className="flex gap-4 border-b border-white/5 pb-1">
-          {['All Auctions', 'Crop Exchange', 'Carbon Credits'].map((tab, i) => (
-            <button key={tab} className={`px-6 py-4 text-xs font-black uppercase tracking-widest transition-all relative ${i === 0 ? 'text-emerald-500' : 'text-zinc-600'}`}>
-              {tab}
-              {i === 0 && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500" />}
+          {[
+            { name: 'All Auctions', path: '/marketplace' },
+            { name: 'Crop Exchange', path: '/marketplace' },
+            { name: 'Carbon Credits', path: '/marketplace/carbon' }
+          ].map((tab, i) => (
+            <button 
+              key={tab.name} 
+              onClick={() => router.push(tab.path)}
+              className={`px-6 py-4 text-xs font-black uppercase tracking-widest transition-all relative ${tab.path === '/marketplace/carbon' ? 'text-white' : 'text-emerald-500'}`}
+            >
+              {tab.name}
+              {tab.name === 'All Auctions' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500" />}
             </button>
           ))}
         </div>
@@ -391,12 +399,29 @@ export default function MarketplacePage() {
                     </div>
                  </div>
 
-                 <button 
-                   onClick={() => setShowReceipt(null)}
-                   className="w-full bg-white text-black py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-colors shadow-2xl active:scale-[0.98]"
-                 >
-                   Acknowledge & Close
-                 </button>
+                 <div className="w-full space-y-3">
+                   {showReceipt.auction.status === 'live' ? (
+                     <button 
+                       onClick={() => router.push(`/auction/${showReceipt.auction.id}`)}
+                       className="w-full bg-emerald-500 text-black py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-emerald-400 transition-colors shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2"
+                     >
+                       Enter Live Auction <ChevronRight className="h-4 w-4" />
+                     </button>
+                   ) : (
+                     <button 
+                       onClick={() => router.push(`/auction/${showReceipt.auction.id}`)}
+                       className="w-full bg-zinc-800 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-zinc-700 transition-colors active:scale-[0.98] flex items-center justify-center gap-2"
+                     >
+                       View Auction Room <ChevronRight className="h-4 w-4" />
+                     </button>
+                   )}
+                   <button 
+                     onClick={() => setShowReceipt(null)}
+                     className="w-full border border-white/10 text-zinc-500 py-4 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:text-white transition-colors"
+                   >
+                     Dismiss
+                   </button>
+                 </div>
               </motion.div>
             </div>
           )}

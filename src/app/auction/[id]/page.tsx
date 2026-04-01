@@ -108,8 +108,39 @@ export default function LiveAuctionPage() {
 
   const handleAuctionEnd = async () => {
     setIsConcluded(true);
-    // Optionally trigger an update to Supabase to mark as completed if admin
+    // Sync update to mark status
     await supabase.from('auctions').update({ status: 'completed' }).eq('id', id);
+    
+    // The current user who just placed the winning bid IS the winner.
+    // We pass their details directly so the server doesn't need to do DB joins.
+    const topBid = bids[0]; // bids are sorted by amount desc
+    const winnerUserId = topBid?.user_id || user?.id;
+    
+    // Get winner email from auth session
+    const { data: { session } } = await supabase.auth.getSession();
+    // If the current user is the winner, we have their email in session
+    const winnerEmail = (winnerUserId === user?.id) ? session?.user?.email : '';
+    const winnerName = topBid?.profiles?.full_name || user?.email?.split('@')[0] || 'Partner';
+    
+    // Trigger backend settlement pipeline
+    try {
+      const response = await fetch('/api/settle-auction', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ 
+           auctionId: id,
+           // Pass winner details directly — no server-side join needed
+           winnerEmail,
+           winnerName,
+           winnerUserId,
+           finalAmount: topBid?.amount
+         })
+      });
+      const result = await response.json();
+      console.log('Settlement result:', result);
+    } catch (err) {
+      console.error('Settlement error:', err);
+    }
   };
 
   const fetchAuctionData = async () => {

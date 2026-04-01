@@ -12,6 +12,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     pathname?.startsWith("/admin") || 
                     pathname?.startsWith("/marketplace") || 
                     pathname?.startsWith("/verify") || 
+                    pathname?.startsWith("/track") || 
                     pathname?.startsWith("/auction/");
 
   return (
