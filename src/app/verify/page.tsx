@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { AgentReasoning } from "../components/AgentReasoning";
 import { DEMO_FARMS } from "../../../lib/constants";
 import type { Farm, AgentResult } from "../../../lib/types";
+import { useTranslation } from "@/lib/translations/provider";
 
 // Dynamic import to avoid SSR issues with Leaflet
 const FarmMap = dynamic(
@@ -21,9 +22,8 @@ const FarmMap = dynamic(
 
 type Step = "idle" | "verifying" | "verified" | "minting" | "minted";
 
-const STEPS = ["Select Farm", "Verify", "Mint Credits", "Listed"] as const;
-
 export default function VerifyPage() {
+  const { t } = useTranslation();
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const [step, setStep] = useState<Step>("idle");
   const [reasoningLines, setReasoningLines] = useState<string[]>([]);
@@ -41,6 +41,13 @@ export default function VerifyPage() {
   // Geocoding Search
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+
+  const STEPS = [
+    t('verify.steps.select'),
+    t('verify.steps.verify'),
+    t('verify.steps.mint'),
+    t('verify.steps.listed')
+  ] as const;
 
   const handleSearchLocation = async () => {
     if (!searchQuery.trim()) return;
@@ -211,51 +218,53 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-16">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#050505] pt-16 md:pt-20">
+      <div className="mx-auto max-w-7xl px-4 py-6 md:py-10 sm:px-6 lg:px-8">
 
         {/* Page Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Farm Verification</h1>
-            <p className="mt-1 text-sm text-zinc-500">
-              Select a farm → AI verifies via satellite → Mint your carbon credits
+            <h1 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter">
+              {t('verify.title')}
+            </h1>
+            <p className="mt-1 md:mt-2 text-[10px] md:text-xs font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">
+              {t('verify.subtitle')}
             </p>
           </div>
           {step !== "idle" && (
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-400 hover:text-white hover:border-white/30 transition-colors"
+              className="flex w-fit items-center gap-2 rounded-full border border-white/5 bg-zinc-900/50 backdrop-blur-xl px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:border-emerald-500/20 transition-all active:scale-95"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              Reset
+              {t('verify.reset')}
             </button>
           )}
         </div>
 
         {/* Step Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center gap-0">
+        <div className="mb-8 md:mb-12 overflow-x-auto pb-4 scrollbar-hide md:overflow-visible">
+          <div className="flex items-center min-w-[600px] md:min-w-0">
             {STEPS.map((s, i) => (
               <div key={s} className="flex items-center flex-1 last:flex-none">
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-2">
                   <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold border-2 transition-all duration-500 ${
+                    className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full text-xs md:text-sm font-black border-2 transition-all duration-500 shadow-2xl ${
                       i < stepIndex
                         ? "border-emerald-500 bg-emerald-500 text-white"
                         : i === stepIndex
-                        ? "border-emerald-500 bg-emerald-500/20 text-emerald-400"
-                        : "border-zinc-700 bg-zinc-900 text-zinc-600"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400 backdrop-blur-xl"
+                        : "border-zinc-800 bg-zinc-900/50 text-zinc-600"
                     }`}
                   >
-                    {i < stepIndex ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                    {i < stepIndex ? <CheckCircle className="h-5 w-5 md:h-6 md:w-6" /> : i + 1}
                   </div>
-                  <span className={`text-xs font-medium whitespace-nowrap ${i <= stepIndex ? "text-emerald-400" : "text-zinc-600"}`}>
+                  <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors duration-500 ${i <= stepIndex ? "text-emerald-400" : "text-zinc-700"}`}>
                     {s}
                   </span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className={`h-0.5 flex-1 mx-2 mb-4 transition-all duration-700 ${i < stepIndex ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                  <div className={`h-px flex-1 mx-4 md:mx-6 mb-6 transition-all duration-700 ${i < stepIndex ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-zinc-800"}`} />
                 )}
               </div>
             ))}
@@ -263,13 +272,13 @@ export default function VerifyPage() {
         </div>
 
         {/* Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-320px)] min-h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 lg:h-[calc(100vh-420px)] lg:min-h-[600px]">
 
           {/* Left: Farm Selector + Map */}
-          <div className="lg:col-span-3 flex flex-col gap-4">
+          <div className="lg:col-span-3 flex flex-col gap-4 md:gap-6">
 
             {/* Farm selector tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="flex gap-2.5 overflow-x-auto pb-2 px-1 scrollbar-hide">
               {DEMO_FARMS.map((farm) => (
                 <button
                   key={farm.id}
@@ -278,14 +287,14 @@ export default function VerifyPage() {
                     setIsCustomLoc(false);
                     if (step === "minted") handleReset();
                   }}
-                  className={`flex-shrink-0 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                  className={`flex-shrink-0 flex items-center gap-2 rounded-2xl border px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                     selectedFarm?.id === farm.id
-                      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                      : "border-white/10 bg-zinc-900 text-zinc-400 hover:border-white/20 hover:text-white"
+                      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400 shadow-xl shadow-emerald-900/10"
+                      : "border-white/5 bg-zinc-900/40 text-zinc-500 hover:border-white/10 hover:text-zinc-300"
                   }`}
                 >
                   <Leaf className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate max-w-[140px]">{farm.name}</span>
+                  <span className="truncate max-w-[120px]">{farm.name}</span>
                 </button>
               ))}
               
@@ -295,21 +304,27 @@ export default function VerifyPage() {
                   setIsCustomLoc(true);
                   if (step === "minted") handleReset();
                 }}
-                className={`flex-shrink-0 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                className={`flex-shrink-0 flex items-center gap-2 rounded-2xl border px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                   isCustomLoc
-                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                    : "border-white/10 bg-zinc-900 text-zinc-400 hover:border-white/20 hover:text-white"
+                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400 shadow-xl shadow-emerald-900/10"
+                    : "border-white/5 bg-zinc-900/40 text-zinc-500 hover:border-white/10 hover:text-zinc-300"
                 }`}
               >
-                <span className="truncate max-w-[140px]">+ Custom Location</span>
+                <span className="truncate max-w-[140px]">+ {t('verify.custom_loc')}</span>
               </button>
             </div>
 
             {/* Custom Location Form */}
             {isCustomLoc && (
-              <div className="flex flex-col gap-3 bg-zinc-900 p-4 rounded-xl border border-white/10">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-emerald-400">Custom Coordinates</span>
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col gap-4 bg-zinc-900/50 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] border border-white/5 shadow-2xl"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+                    {t('verify.custom_loc')}
+                  </span>
                   <button
                     onClick={() => {
                       if (navigator.geolocation) {
@@ -322,9 +337,9 @@ export default function VerifyPage() {
                         );
                       }
                     }}
-                    className="flex items-center gap-1.5 text-[11px] font-medium text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 px-2.5 py-1 rounded-md transition-colors"
+                    className="flex w-fit items-center gap-2 text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 px-4 py-2 rounded-xl transition-all active:scale-95"
                   >
-                    📍 Get Current Location
+                    📍 {t('verify.get_current')}
                   </button>
                 </div>
                 
@@ -332,62 +347,62 @@ export default function VerifyPage() {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Search location (e.g., Bangalore)..."
+                    placeholder={t('verify.search_placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSearchLocation();
                     }}
-                    className="flex-1 bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    className="flex-1 bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30 transition-all font-medium"
                   />
                   <button
                     onClick={handleSearchLocation}
                     disabled={isSearching || !searchQuery.trim()}
-                    className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 hover:text-white border border-white/10 transition-colors px-4 py-2 rounded-lg text-sm font-medium"
+                    className="bg-zinc-800/80 hover:bg-zinc-700 disabled:opacity-30 text-white border border-white/5 transition-all px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95"
                   >
-                    {isSearching ? "..." : "Search"}
+                    {isSearching ? "..." : t('verify.search_btn')}
                   </button>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex-1 space-y-1">
-                    <label className="text-xs text-zinc-500">Latitude</label>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 md:gap-4">
+                  <div className="sm:col-span-1 space-y-1.5">
+                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">{t('verify.lat')}</label>
                     <input
                       type="number"
                       value={customLat}
                       onChange={(e) => setCustomLat(e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500/30 transition-all"
                     />
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <label className="text-xs text-zinc-500">Longitude</label>
+                  <div className="sm:col-span-1 space-y-1.5">
+                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">{t('verify.lng')}</label>
                     <input
                       type="number"
                       value={customLng}
                       onChange={(e) => setCustomLng(e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500/30 transition-all"
                     />
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <label className="text-xs text-zinc-500">Size (Acres)</label>
+                  <div className="sm:col-span-1 space-y-1.5">
+                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">{t('verify.size')}</label>
                     <input
                       type="number"
                       value={customSize}
                       onChange={(e) => setCustomSize(e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500/30 transition-all"
                     />
                   </div>
-                  <div className="flex items-end">
+                  <div className="sm:col-span-1 flex items-end">
                     <button
                       onClick={() => {
                         const lat = parseFloat(customLat) || 0;
                         const lng = parseFloat(customLng) || 0;
-                        // Generate a small square polygon mock around the center
-                        const offset = 0.001 * Math.sqrt(parseFloat(customSize) || 1);
+                        const size = parseFloat(customSize) || 1;
+                        const offset = 0.001 * Math.sqrt(size);
                         setSelectedFarm({
                           id: Date.now(),
                           name: "Custom Farm",
-                          sizeAcres: parseFloat(customSize) || 1,
+                          sizeAcres: size,
                           ownerId: "custom_farmer_001",
                           verified: false,
                           coordinates: {
@@ -403,119 +418,129 @@ export default function VerifyPage() {
                           }
                         });
                       }}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white border border-white/10 transition-colors px-4 py-2 h-[38px] rounded-lg text-sm font-medium w-full sm:w-auto"
+                      className="w-full bg-emerald-500 text-black border-none transition-all px-4 py-3 h-[46px] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 active:scale-95 shadow-xl shadow-emerald-500/20"
                     >
-                      Set on Map
+                      {t('verify.set_map')}
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            {/* Map */}
-            <div className="flex-1">
+            {/* Map Container */}
+            <div className="flex-1 rounded-[2.5rem] overflow-hidden border border-white/5 bg-zinc-900/40 shadow-2xl group relative">
               <FarmMap 
                 selectedFarm={selectedFarm} 
-                className="h-full min-h-[340px]" 
+                className="h-full min-h-[360px] md:min-h-[440px]" 
                 verificationStep={step}
                 ndviScore={agentResult?.ndviScore ?? selectedFarm?.ndviScore}
               />
+              <div className="absolute inset-0 pointer-events-none border-[1px] border-white/5 rounded-[2.5rem] z-10" />
             </div>
 
-            {/* Verify button */}
+            {/* Verify primary action */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               onClick={handleVerify}
               disabled={!selectedFarm || step === "verifying" || step === "minting"}
-              className="relative flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white shadow-xl shadow-emerald-900/40 transition-all hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden group"
+              className="relative overflow-hidden flex w-full items-center justify-center gap-4 rounded-3xl bg-white px-8 py-5 md:py-6 text-sm md:text-base font-black text-black shadow-2xl transition-all hover:bg-emerald-400 disabled:opacity-20 disabled:cursor-not-allowed group uppercase tracking-[0.2em]"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              {step === "verifying" ? (
-                <>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
-                  />
-                  Verifying Farm...
-                </>
-              ) : (
-                <>
-                  <Satellite className="h-6 w-6" />
-                  Verify Farm
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </>
-              )}
+              <div className="absolute inset-0 bg-emerald-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500 rounded-3xl" />
+              <span className="relative z-10 flex items-center gap-3">
+                {step === "verifying" ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                      className="h-5 w-5 md:h-6 md:w-6 rounded-full border-2 border-black/20 border-t-black"
+                    />
+                    {t('verify.verifying_btn')}
+                  </>
+                ) : (
+                  <>
+                    <Satellite className="h-5 w-5 md:h-6 md:w-6" />
+                    {t('verify.verify_btn')}
+                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:translate-x-2" />
+                  </>
+                )}
+              </span>
             </motion.button>
           </div>
 
           {/* Right: Agent Reasoning Panel */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            <AgentReasoning
-              lines={reasoningLines}
-              isLoading={step === "verifying"}
-              result={agentResult}
-            />
+          <div className="lg:col-span-2 flex flex-col gap-4 md:gap-6 h-full">
+            <div className="flex-1 min-h-[400px] lg:h-full">
+              <AgentReasoning
+                lines={reasoningLines}
+                isLoading={step === "verifying"}
+                result={agentResult}
+              />
+            </div>
 
-            {/* Mint button — appears after verification */}
+            {/* Post-Verification Actions */}
             <AnimatePresence>
               {step === "verified" && agentResult?.approved && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="space-y-3"
+                  exit={{ opacity: 0, y: 20 }}
+                  className="space-y-4"
                 >
                   {mintError && (
-                    <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-red-400">
+                    <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4 text-[10px] font-bold text-red-400 uppercase tracking-widest backdrop-blur-xl">
                       ❌ {mintError}
                     </div>
                   )}
                   <button
                     onClick={handleMint}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 hover:text-emerald-300"
+                    className="flex w-full items-center justify-center gap-3 rounded-[1.5rem] border border-emerald-500/30 bg-emerald-500/10 px-8 py-5 text-xs font-black text-emerald-400 uppercase tracking-widest transition-all hover:bg-emerald-500/20 active:scale-[0.98] shadow-2xl shadow-emerald-900/20"
                   >
                     <Upload className="h-4 w-4" />
-                    Mint {agentResult.creditAmount} Credits on Polygon
+                    {t('verify.mint_prefix')} {agentResult.creditAmount} {t('verify.mint_suffix')}
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Success state after minting */}
+            {/* Success state — Global Anchor Verification */}
             <AnimatePresence>
               {step === "minted" && txHash && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-4"
+                  className="rounded-[2.5rem] border border-emerald-500/30 bg-emerald-500/5 p-6 md:p-8 space-y-6 backdrop-blur-2xl shadow-3xl overflow-hidden relative group"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <CheckCircle className="h-32 w-32 -rotate-12" />
+                  </div>
+
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-2xl bg-emerald-500 text-black shadow-xl shadow-emerald-500/50">
+                      <CheckCircle className="h-6 w-6 md:h-7 md:w-7" />
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-sm">Credits Minted!</div>
-                      <div className="text-xs text-zinc-500 font-mono mt-0.5 truncate max-w-[200px]">{txHash.slice(0, 20)}...</div>
+                      <div className="font-black text-white text-lg md:text-xl uppercase tracking-tighter">{t('verify.mint_success')}</div>
+                      <div className="text-[9px] md:text-[10px] text-emerald-500/60 font-mono font-bold mt-0.5 truncate max-w-[180px] md:max-w-none">{txHash}</div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 relative z-10">
                     <a
                       href={`https://amoy.polygonscan.com/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 rounded-xl bg-zinc-800 border border-white/10 px-4 py-2.5 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
+                      className="flex items-center justify-center gap-2.5 rounded-2xl bg-zinc-900/80 border border-white/5 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:border-white/10 transition-all active:scale-[0.98]"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View on Polygonscan
+                      <ExternalLink className="h-4 w-4" />
+                      {t('verify.explorer')}
                     </a>
                     <Link
                       href="/marketplace"
-                      className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600/80 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:bg-emerald-600"
+                      className="flex items-center justify-center gap-2.5 rounded-2xl bg-white px-6 py-4 text-[10px] font-black uppercase tracking-widest text-black shadow-2xl transition-all hover:bg-emerald-400 active:scale-[0.98]"
                     >
-                      <ArrowRight className="h-3.5 w-3.5" />
-                      View on Marketplace
+                      <ArrowRight className="h-4 w-4" />
+                      {t('verify.view_market')}
                     </Link>
                   </div>
                 </motion.div>
