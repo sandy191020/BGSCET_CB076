@@ -386,10 +386,14 @@ export default function MarketplacePage() {
                  </div>
 
                  <button 
-                   onClick={() => setShowReceipt(null)}
-                   className="w-full bg-white text-black py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-colors shadow-2xl active:scale-[0.98]"
+                   onClick={() => {
+                     const redirectId = showReceipt.auction.id;
+                     setShowReceipt(null);
+                     router.push(`/auction/${redirectId}`);
+                   }}
+                   className="w-full bg-emerald-500 text-black py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-emerald-400 transition-colors shadow-2xl active:scale-[0.98] flex justify-center items-center gap-2"
                  >
-                   Acknowledge & Close
+                   Enter Auction Hub <ChevronRight className="h-4 w-4" />
                  </button>
               </motion.div>
             </div>
