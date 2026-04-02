@@ -25,12 +25,9 @@ const navStyle = `
   align-items: center;
   justify-content: center;
   width: 100%;
-  md:width: 130px;
   height: 48px;
-  md:height: 44px;
   border-radius: 12px;
   font-size: 14px;
-  md:font-size: 13px;
   font-weight: 600;
   color: #a1a1aa;
   background: rgba(255, 255, 255, 0.03);
@@ -39,6 +36,14 @@ const navStyle = `
   text-transform: uppercase;
   letter-spacing: 0.5px;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .nav-link-btn {
+    width: 130px;
+    height: 44px;
+    font-size: 12px;
+  }
 }
 
 .nav-link-btn:hover {
